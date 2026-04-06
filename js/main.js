@@ -72,10 +72,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 4. Mobile menu toggle
   const navToggle = document.getElementById('navToggle');
+  const navInner = document.querySelector('.nav-inner');
   const navLinks = document.querySelector('.nav-links');
   if (navToggle) {
     navToggle.addEventListener('click', () => {
-      navLinks.classList.toggle('open');
+      navInner.classList.toggle('open-menu');
+      // keep this for the anchor link logic below
+      navLinks.classList.toggle('open-menu-compat');
     });
   }
 
@@ -97,8 +100,9 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function(e) {
       e.preventDefault();
-      if (navLinks.classList.contains('open')) {
-        navLinks.classList.remove('open');
+      if (navInner.classList.contains('open-menu')) {
+        navInner.classList.remove('open-menu');
+        navLinks.classList.remove('open-menu-compat');
       }
       const targetId = this.getAttribute('href').substring(1);
       const targetEl = document.getElementById(targetId);

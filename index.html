@@ -1,18 +1,23 @@
 <!DOCTYPE html>
 <html lang="zh-CN" data-theme="light">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>YuYi — Unified Cloud Memory Infrastructure</title>
-  <meta name="description" content="YuYi is a self-hosted, model-agnostic cloud memory layer for AI agents. One memory layer shared across every tool you use." />
+  <meta name="description"
+    content="YuYi is a self-hosted, model-agnostic cloud memory layer for AI agents. One memory layer shared across every tool you use." />
   <meta property="og:title" content="YuYi — Unified Cloud Memory Infrastructure" />
   <meta property="og:description" content="Self-hosted long-term memory for AI agents. Model-agnostic. Open source." />
   <link rel="icon" type="image/png" href="img/羽忆-small.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
+
 <body>
 
   <!-- ─── NAV ─────────────────────────────────────────────── -->
@@ -22,31 +27,50 @@
         <img src="img/羽忆-origin.png" alt="PlumeMemory Logo" class="logo-img" />
         <span class="logo-text" data-i18n="logo_name">羽译</span>
       </a>
-      <ul class="nav-links">
-        <li><a href="#architecture" data-i18n="nav_arch">Architecture</a></li>
-        <li><a href="#features" data-i18n="nav_feat">Features</a></li>
-        <li><a href="#api" data-i18n="nav_api">API</a></li>
-        <li><a href="#deploy" data-i18n="nav_deploy">Deploy</a></li>
-      </ul>
-      <div class="nav-actions">
-        <div class="controls">
-          <select id="langSwitch" class="ctrl-select" aria-label="Switch Language">
-            <option value="en">EN</option>
-            <option value="zh-CN">简体中文</option>
-            <option value="zh-TW">繁體中文</option>
-            <option value="ja">日本語</option>
-            <option value="ko">한국어</option>
-          </select>
-          <button id="themeToggle" class="ctrl-btn" aria-label="Toggle Theme">
-            <svg class="sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-            <svg class="moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-          </button>
+      <div class="nav-menu-wrapper">
+        <ul class="nav-links">
+          <li><a href="#architecture" data-i18n="nav_arch">Architecture</a></li>
+          <li><a href="#features" data-i18n="nav_feat">Features</a></li>
+          <li><a href="#api" data-i18n="nav_api">API</a></li>
+          <li><a href="#deploy" data-i18n="nav_deploy">Deploy</a></li>
+        </ul>
+        <div class="nav-actions">
+          <div class="controls">
+            <select id="langSwitch" class="ctrl-select" aria-label="Switch Language">
+              <option value="en">EN</option>
+              <option value="zh-CN">简体中文</option>
+              <option value="zh-TW">繁體中文</option>
+              <option value="ja">日本語</option>
+              <option value="ko">한국어</option>
+            </select>
+            <button id="themeToggle" class="ctrl-btn" aria-label="Toggle Theme">
+              <svg class="sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <circle cx="12" cy="12" r="5" />
+                <line x1="12" y1="1" x2="12" y2="3" />
+                <line x1="12" y1="21" x2="12" y2="23" />
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                <line x1="1" y1="12" x2="3" y2="12" />
+                <line x1="21" y1="12" x2="23" y2="12" />
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+              </svg>
+              <svg class="moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+              </svg>
+            </button>
+          </div>
+          <a href="https://github.com/plumememory/yuyi" class="btn-ghost" target="_blank">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+            </svg>
+            <span class="gh-text">GitHub</span>
+          </a>
+          <a href="#deploy" class="btn-primary" data-i18n="btn_started">Get Started</a>
         </div>
-        <a href="https://github.com/plumememory/yuyi" class="btn-ghost" target="_blank">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
-          <span class="gh-text">GitHub</span>
-        </a>
-        <a href="#deploy" class="btn-primary" data-i18n="btn_started">Get Started</a>
       </div>
       <button class="nav-toggle" id="navToggle" aria-label="Menu">
         <span></span><span></span><span></span>
@@ -60,7 +84,7 @@
       <div class="hero-content">
         <div class="hero-badge" data-i18n="hero_badge">Open Source · Self-Hosted · v0.1 MVP</div>
         <h1 class="hero-headline">
-          <span data-i18n="hero_head1">Shared Memory.</span><br/>
+          <span data-i18n="hero_head1">Shared Memory.</span><br />
           <em data-i18n="hero_head2">Unified Soul.</em>
         </h1>
         <p class="hero-sub" data-i18n="hero_sub">
@@ -120,21 +144,26 @@
         <div class="problem-item reveal">
           <div class="problem-num">01</div>
           <h3 data-i18n="prob_h1">Closed ecosystems</h3>
-          <p data-i18n="prob_p1">ChatGPT Memory, Claude Memory — each is siloed. The knowledge you build in one tool never reaches another.</p>
+          <p data-i18n="prob_p1">ChatGPT Memory, Claude Memory — each is siloed. The knowledge you build in one tool
+            never reaches another.</p>
         </div>
         <div class="problem-item reveal">
           <div class="problem-num">02</div>
           <h3 data-i18n="prob_h2">Context amnesia</h3>
-          <p data-i18n="prob_p2">Switch models, switch clients, or start a new session — and everything you established is gone. Agents start from zero, every time.</p>
+          <p data-i18n="prob_p2">Switch models, switch clients, or start a new session — and everything you established
+            is gone. Agents start from zero, every time.</p>
         </div>
         <div class="problem-item reveal">
           <div class="problem-num">03</div>
           <h3 data-i18n="prob_h3">No user control</h3>
-          <p data-i18n="prob_p3">You can't audit what's stored, delete specific memories, or migrate your data. Your knowledge lives at someone else's address.</p>
+          <p data-i18n="prob_p3">You can't audit what's stored, delete specific memories, or migrate your data. Your
+            knowledge lives at someone else's address.</p>
         </div>
       </div>
       <div class="problem-statement reveal">
-        <p data-i18n="prob_stat">This isn't a bug in any single product. It's a structural gap — memory has been treated as a product feature when it should be an independent infrastructure layer, like a database or a version control system.</p>
+        <p data-i18n="prob_stat">This isn't a bug in any single product. It's a structural gap — memory has been treated
+          as a product feature when it should be an independent infrastructure layer, like a database or a version
+          control system.</p>
       </div>
     </div>
   </section>
@@ -148,32 +177,38 @@
         <div class="principle reveal">
           <div class="principle-rank">P1</div>
           <h3 data-i18n="prin_h1">User data sovereignty</h3>
-          <p data-i18n="prin_p1">Memory belongs to you. Self-deploy, self-manage, export everything, delete for real. No external accounts required.</p>
+          <p data-i18n="prin_p1">Memory belongs to you. Self-deploy, self-manage, export everything, delete for real. No
+            external accounts required.</p>
         </div>
         <div class="principle reveal">
           <div class="principle-rank">P2</div>
           <h3 data-i18n="prin_h2">Explicit control over automation</h3>
-          <p data-i18n="prin_p2">Stage one: write only when you say so. Auto-write is opt-in, always transparent, always reversible.</p>
+          <p data-i18n="prin_p2">Stage one: write only when you say so. Auto-write is opt-in, always transparent, always
+            reversible.</p>
         </div>
         <div class="principle reveal">
           <div class="principle-rank">P3</div>
           <h3 data-i18n="prin_h3">Memory and history are different things</h3>
-          <p data-i18n="prin_p3">Stable Memory stores distilled facts. History Recall stores process context. Conflating them destroys recall quality.</p>
+          <p data-i18n="prin_p3">Stable Memory stores distilled facts. History Recall stores process context. Conflating
+            them destroys recall quality.</p>
         </div>
         <div class="principle reveal">
           <div class="principle-rank">P4</div>
           <h3 data-i18n="prin_h4">Model and host agnostic</h3>
-          <p data-i18n="prin_p4">No dependency on any vendor's native memory API. Plugin any LLM or embedding model. Agent stops working? Core keeps running.</p>
+          <p data-i18n="prin_p4">No dependency on any vendor's native memory API. Plugin any LLM or embedding model.
+            Agent stops working? Core keeps running.</p>
         </div>
         <div class="principle reveal">
           <div class="principle-rank">P5</div>
           <h3 data-i18n="prin_h5">Recall is not search</h3>
-          <p data-i18n="prin_p5">Recall returns a compacted, token-budgeted context block ready to inject. Search returns a list. They are different operations.</p>
+          <p data-i18n="prin_p5">Recall returns a compacted, token-budgeted context block ready to inject. Search
+            returns a list. They are different operations.</p>
         </div>
         <div class="principle reveal">
           <div class="principle-rank">P6</div>
           <h3 data-i18n="prin_h6">Closed loop first</h3>
-          <p data-i18n="prin_p6">Ship the minimum verifiable loop. Incremental complexity on top of a proven foundation — not features woven into an unproven base.</p>
+          <p data-i18n="prin_p6">Ship the minimum verifiable loop. Incremental complexity on top of a proven foundation
+            — not features woven into an unproven base.</p>
         </div>
       </div>
       <div class="priority-chain reveal">
@@ -202,30 +237,48 @@
       <h2 class="section-title" data-i18n="arch_title">Six layers, three pipelines, one stable API surface</h2>
       <div class="arch-layout">
         <div class="arch-diagram reveal">
-          <div class="layer layer-1"><span class="layer-label">Layer 1</span><span class="layer-name" data-i18n="arch_l1">Client / Agent Layer</span><span class="layer-desc" data-i18n="arch_l1d">Codex · Antigravity · Claude Desktop · IDE Agent · CLI</span></div>
+          <div class="layer layer-1"><span class="layer-label">Layer 1</span><span class="layer-name"
+              data-i18n="arch_l1">Client / Agent Layer</span><span class="layer-desc" data-i18n="arch_l1d">Codex ·
+              Antigravity · Claude Desktop · IDE Agent · CLI</span></div>
           <div class="layer-arrow">↓</div>
-          <div class="layer layer-2"><span class="layer-label">Layer 2</span><span class="layer-name" data-i18n="arch_l2">Access Adapter Layer</span><span class="layer-desc" data-i18n="arch_l2d">Skill · Tool · MCP Server · CLI · SDK</span></div>
+          <div class="layer layer-2"><span class="layer-label">Layer 2</span><span class="layer-name"
+              data-i18n="arch_l2">Access Adapter Layer</span><span class="layer-desc" data-i18n="arch_l2d">Skill · Tool
+              · MCP Server · CLI · SDK</span></div>
           <div class="layer-arrow">↓</div>
-          <div class="layer layer-3 layer-core"><span class="layer-label">Layer 3</span><span class="layer-name" data-i18n="arch_l3">Memory Orchestrator</span><div class="layer-pipes"><span data-i18n="arch_p1">Write Pipeline</span><span data-i18n="arch_p2">Recall Pipeline</span><span data-i18n="arch_p3">Control Pipeline</span></div></div>
+          <div class="layer layer-3 layer-core"><span class="layer-label">Layer 3</span><span class="layer-name"
+              data-i18n="arch_l3">Memory Orchestrator</span>
+            <div class="layer-pipes"><span data-i18n="arch_p1">Write Pipeline</span><span data-i18n="arch_p2">Recall
+                Pipeline</span><span data-i18n="arch_p3">Control Pipeline</span></div>
+          </div>
           <div class="layer-arrow">↓</div>
-          <div class="layer layer-4"><span class="layer-label">Layer 4</span><span class="layer-name" data-i18n="arch_l4">Memory Storage Plane</span><span class="layer-desc" data-i18n="arch_l4d">Stable Memory Store · History Recall Store · Control Metadata</span></div>
+          <div class="layer layer-4"><span class="layer-label">Layer 4</span><span class="layer-name"
+              data-i18n="arch_l4">Memory Storage Plane</span><span class="layer-desc" data-i18n="arch_l4d">Stable Memory
+              Store · History Recall Store · Control Metadata</span></div>
           <div class="layer-arrow">↓</div>
-          <div class="layer layer-5"><span class="layer-label">Layer 5</span><span class="layer-name" data-i18n="arch_l5">Search &amp; Ranking</span><span class="layer-desc" data-i18n="arch_l5d">Lexical · Vector (pgvector) · RRF Fusion · Tag &amp; Scope Filter</span></div>
+          <div class="layer layer-5"><span class="layer-label">Layer 5</span><span class="layer-name"
+              data-i18n="arch_l5">Search &amp; Ranking</span><span class="layer-desc" data-i18n="arch_l5d">Lexical ·
+              Vector (pgvector) · RRF Fusion · Tag &amp; Scope Filter</span></div>
           <div class="layer-arrow">↓</div>
-          <div class="layer layer-6"><span class="layer-label">Layer 6</span><span class="layer-name" data-i18n="arch_l6">Storage / Infra</span><span class="layer-desc" data-i18n="arch_l6d">PostgreSQL · Redis · Object Store · TLS · Reverse Proxy</span></div>
+          <div class="layer layer-6"><span class="layer-label">Layer 6</span><span class="layer-name"
+              data-i18n="arch_l6">Storage / Infra</span><span class="layer-desc" data-i18n="arch_l6d">PostgreSQL · Redis
+              · Object Store · TLS · Reverse Proxy</span></div>
         </div>
         <div class="arch-callouts">
           <div class="callout reveal">
             <h4 data-i18n="arch_c1t">Adapters are thin</h4>
-            <p data-i18n="arch_c1p">Every adapter maps intent to a standard API call. All business logic lives server-side. Adding a new agent requires only a new adapter — the core never changes.</p>
+            <p data-i18n="arch_c1p">Every adapter maps intent to a standard API call. All business logic lives
+              server-side. Adding a new agent requires only a new adapter — the core never changes.</p>
           </div>
           <div class="callout reveal">
             <h4 data-i18n="arch_c2t">Orchestrator is the brain</h4>
-            <p data-i18n="arch_c2p">Layer 3 answers: is this worth storing? which layer? when recalled, what fits? It is judgment and scheduling, not storage.</p>
+            <p data-i18n="arch_c2p">Layer 3 answers: is this worth storing? which layer? when recalled, what fits? It is
+              judgment and scheduling, not storage.</p>
           </div>
           <div class="callout reveal">
             <h4 data-i18n="arch_c3t">Search degrades gracefully</h4>
-            <p data-i18n="arch_c3p">Vector search and lexical search fail independently. No embedding provider means pure lexical. zhparser unavailable means plainto_tsquery. The pipeline never crashes from a missing dependency.</p>
+            <p data-i18n="arch_c3p">Vector search and lexical search fail independently. No embedding provider means
+              pure lexical. zhparser unavailable means plainto_tsquery. The pipeline never crashes from a missing
+              dependency.</p>
           </div>
         </div>
       </div>
@@ -280,25 +333,30 @@
       <div class="memory-judge-intro reveal">
         <div class="mj-text">
           <h3 data-i18n="mj_h3">Memory Judge decides where things go</h3>
-          <p data-i18n="mj_p" data-i18n-html="true">A three-stage decision chain runs on every write request. Hard rules run first and <em>cannot</em> be overridden by the LLM. The LLM is advisory. The rule fallback is always available.</p>
+          <p data-i18n="mj_p" data-i18n-html="true">A three-stage decision chain runs on every write request. Hard rules
+            run first and <em>cannot</em> be overridden by the LLM. The LLM is advisory. The rule fallback is always
+            available.</p>
         </div>
         <div class="mj-chain">
           <div class="chain-step">
             <div class="cs-num">L1</div>
             <div class="cs-label" data-i18n="cs1_l">Hard Guards</div>
-            <div class="cs-desc" data-i18n="cs1_d">Sensitive content, empty inputs, length violations — deterministic, cannot be overridden</div>
+            <div class="cs-desc" data-i18n="cs1_d">Sensitive content, empty inputs, length violations — deterministic,
+              cannot be overridden</div>
           </div>
           <div class="chain-arr">→</div>
           <div class="chain-step">
             <div class="cs-num">L2</div>
             <div class="cs-label" data-i18n="cs2_l">LLM Judge</div>
-            <div class="cs-desc" data-i18n="cs2_d">Structured JSON output; confidence threshold enforced; auto-fallback on failure</div>
+            <div class="cs-desc" data-i18n="cs2_d">Structured JSON output; confidence threshold enforced; auto-fallback
+              on failure</div>
           </div>
           <div class="chain-arr">→</div>
           <div class="chain-step">
             <div class="cs-num">L3</div>
             <div class="cs-label" data-i18n="cs3_l">Rule Fallback</div>
-            <div class="cs-desc" data-i18n="cs3_d">Admin-configurable rule table; keyword classification, importance defaults, semantic_key inference</div>
+            <div class="cs-desc" data-i18n="cs3_d">Admin-configurable rule table; keyword classification, importance
+              defaults, semantic_key inference</div>
           </div>
         </div>
       </div>
@@ -310,25 +368,50 @@
     <div class="container">
       <div class="section-label" data-i18n="rec_label">Recall Orchestrator</div>
       <h2 class="section-title" data-i18n="rec_title">Recall is not search. It's context engineering.</h2>
-      <p class="section-intro" data-i18n="rec_p" data-i18n-md="true">The Recall Orchestrator runs eight steps to produce a <code>RecallContextBlock</code> — a compacted, deduplicated, token-budgeted block ready to inject directly into any agent's context window.</p>
+      <p class="section-intro" data-i18n="rec_p" data-i18n-md="true">The Recall Orchestrator runs eight steps to produce
+        a <code>RecallContextBlock</code> — a compacted, deduplicated, token-budgeted block ready to inject directly
+        into any agent's context window.</p>
       <div class="recall-flow reveal">
-        <div class="rf-step"><span class="rf-num">1</span><span class="rf-label" data-i18n="rf1_l">Candidate retrieval</span><span class="rf-note" data-i18n="rf1_n">Hybrid: lexical + vector, both stores</span></div>
-        <div class="rf-step"><span class="rf-num">2</span><span class="rf-label" data-i18n="rf2_l">Scoring</span><span class="rf-note" data-i18n="rf2_n">importance × recency × hybridScore</span></div>
-        <div class="rf-step"><span class="rf-num">3</span><span class="rf-label" data-i18n="rf3_l">Sorting</span><span class="rf-note" data-i18n="rf3_n">Descending by composite score</span></div>
-        <div class="rf-step"><span class="rf-num">4</span><span class="rf-label" data-i18n="rf4_l">semantic_key dedup</span><span class="rf-note" data-i18n="rf4_n">Same key → only highest-score entry</span></div>
-        <div class="rf-step"><span class="rf-num">5</span><span class="rf-label" data-i18n="rf5_l">Conflict detection</span><span class="rf-note" data-i18n="rf5_n">hasConflict flagged memories surfaced</span></div>
-        <div class="rf-step"><span class="rf-num">6</span><span class="rf-label" data-i18n="rf6_l">Token budget</span><span class="rf-note" data-i18n="rf6_n">stable/history split by prefer param</span></div>
-        <div class="rf-step"><span class="rf-num">7</span><span class="rf-label" data-i18n="rf7_l">Freshness notes</span><span class="rf-note" data-i18n="rf7_n">30/90/365-day warn thresholds</span></div>
-        <div class="rf-step"><span class="rf-num">8</span><span class="rf-label" data-i18n="rf8_l">Block assembly</span><span class="rf-note" data-i18n="rf8_n">RecallContextBlock returned</span></div>
+        <div class="rf-step"><span class="rf-num">1</span><span class="rf-label" data-i18n="rf1_l">Candidate
+            retrieval</span><span class="rf-note" data-i18n="rf1_n">Hybrid: lexical + vector, both stores</span></div>
+        <div class="rf-step"><span class="rf-num">2</span><span class="rf-label" data-i18n="rf2_l">Scoring</span><span
+            class="rf-note" data-i18n="rf2_n">importance × recency × hybridScore</span></div>
+        <div class="rf-step"><span class="rf-num">3</span><span class="rf-label" data-i18n="rf3_l">Sorting</span><span
+            class="rf-note" data-i18n="rf3_n">Descending by composite score</span></div>
+        <div class="rf-step"><span class="rf-num">4</span><span class="rf-label" data-i18n="rf4_l">semantic_key
+            dedup</span><span class="rf-note" data-i18n="rf4_n">Same key → only highest-score entry</span></div>
+        <div class="rf-step"><span class="rf-num">5</span><span class="rf-label" data-i18n="rf5_l">Conflict
+            detection</span><span class="rf-note" data-i18n="rf5_n">hasConflict flagged memories surfaced</span></div>
+        <div class="rf-step"><span class="rf-num">6</span><span class="rf-label" data-i18n="rf6_l">Token
+            budget</span><span class="rf-note" data-i18n="rf6_n">stable/history split by prefer param</span></div>
+        <div class="rf-step"><span class="rf-num">7</span><span class="rf-label" data-i18n="rf7_l">Freshness
+            notes</span><span class="rf-note" data-i18n="rf7_n">30/90/365-day warn thresholds</span></div>
+        <div class="rf-step"><span class="rf-num">8</span><span class="rf-label" data-i18n="rf8_l">Block
+            assembly</span><span class="rf-note" data-i18n="rf8_n">RecallContextBlock returned</span></div>
       </div>
       <div class="recall-prefer reveal">
-        <div class="rp-label" data-i18n="rp_label" data-i18n-md="true">Token budget allocation by <code>prefer</code> mode:</div>
+        <div class="rp-label" data-i18n="rp_label" data-i18n-md="true">Token budget allocation by <code>prefer</code>
+          mode:</div>
         <div class="rp-table">
           <div class="rp-row header"><span>Mode</span><span>Stable</span><span>History</span></div>
-          <div class="rp-row"><span class="mode">stable_first</span><span class="bar-cell"><div class="bar stable" style="width:70%"></div><span>70%</span></span><span class="bar-cell"><div class="bar history" style="width:30%"></div><span>30%</span></span></div>
-          <div class="rp-row"><span class="mode">history_first</span><span class="bar-cell"><div class="bar stable" style="width:30%"></div><span>30%</span></span><span class="bar-cell"><div class="bar history" style="width:70%"></div><span>70%</span></span></div>
-          <div class="rp-row"><span class="mode">balanced</span><span class="bar-cell"><div class="bar stable" style="width:50%"></div><span>50%</span></span><span class="bar-cell"><div class="bar history" style="width:50%"></div><span>50%</span></span></div>
-          <div class="rp-row"><span class="mode">stable_only</span><span class="bar-cell"><div class="bar stable" style="width:100%"></div><span>100%</span></span><span class="bar-cell"><span class="dim">—</span></span></div>
+          <div class="rp-row"><span class="mode">stable_first</span><span class="bar-cell">
+              <div class="bar stable" style="width:70%"></div><span>70%</span>
+            </span><span class="bar-cell">
+              <div class="bar history" style="width:30%"></div><span>30%</span>
+            </span></div>
+          <div class="rp-row"><span class="mode">history_first</span><span class="bar-cell">
+              <div class="bar stable" style="width:30%"></div><span>30%</span>
+            </span><span class="bar-cell">
+              <div class="bar history" style="width:70%"></div><span>70%</span>
+            </span></div>
+          <div class="rp-row"><span class="mode">balanced</span><span class="bar-cell">
+              <div class="bar stable" style="width:50%"></div><span>50%</span>
+            </span><span class="bar-cell">
+              <div class="bar history" style="width:50%"></div><span>50%</span>
+            </span></div>
+          <div class="rp-row"><span class="mode">stable_only</span><span class="bar-cell">
+              <div class="bar stable" style="width:100%"></div><span>100%</span>
+            </span><span class="bar-cell"><span class="dim">—</span></span></div>
         </div>
       </div>
     </div>
@@ -339,7 +422,10 @@
     <div class="container">
       <div class="section-label" data-i18n="api_label">API Reference</div>
       <h2 class="section-title" data-i18n="api_title">A stable, versioned REST surface</h2>
-      <p class="section-intro" data-i18n="api_p" data-i18n-md="true">All endpoints return <code>{"{ code, message, data, httpStatus, timestamp }"}</code>. Errors use structured <code>MEM-*</code> codes, never raw HTTP status text.</p>
+      <p class="section-intro" data-i18n="api_p" data-i18n-md="true">All endpoints return
+        <code>{"{ code, message, data, httpStatus, timestamp }"}</code>. Errors use structured <code>MEM-*</code> codes,
+        never raw HTTP status text.
+      </p>
       <div class="api-layout">
         <div class="api-nav">
           <button class="api-tab active" data-tab="write" data-i18n="api_w">Write</button>
@@ -350,7 +436,8 @@
         <div class="api-panels">
 
           <div class="api-panel active" id="tab-write">
-            <div class="endpoint"><span class="method post">POST</span><span class="path">/v1/memories</span><span class="ep-desc" data-i18n="ep_w1">Write a stable memory</span></div>
+            <div class="endpoint"><span class="method post">POST</span><span class="path">/v1/memories</span><span
+                class="ep-desc" data-i18n="ep_w1">Write a stable memory</span></div>
             <pre class="code-block"><code><span class="c">// Request body</span>
 {
   <span class="key">"content"</span>: <span class="str">"All backend APIs return {code, message, data}"</span>,
@@ -366,7 +453,9 @@
   <span class="key">"code"</span>: <span class="str">"CREATED"</span>,
   <span class="key">"data"</span>: { <span class="key">"id"</span>: <span class="str">"mem_a1b2c3d4"</span>, <span class="key">"status"</span>: <span class="str">"active"</span>, <span class="key">"version"</span>: <span class="num">1</span> }
 }</code></pre>
-            <div class="endpoint mt"><span class="method post">POST</span><span class="path">/v1/history-records</span><span class="ep-desc" data-i18n="ep_w2">Write a history record</span></div>
+            <div class="endpoint mt"><span class="method post">POST</span><span
+                class="path">/v1/history-records</span><span class="ep-desc" data-i18n="ep_w2">Write a history
+                record</span></div>
             <pre class="code-block"><code>{
   <span class="key">"content"</span>: <span class="str">"Completed user auth module. MailCodeService handles TTL."</span>,
   <span class="key">"recordKind"</span>: <span class="str">"task_summary"</span>,
@@ -376,7 +465,8 @@
           </div>
 
           <div class="api-panel" id="tab-recall">
-            <div class="endpoint"><span class="method post">POST</span><span class="path">/v1/recall</span><span class="ep-desc" data-i18n="ep_r1">Task context recall</span></div>
+            <div class="endpoint"><span class="method post">POST</span><span class="path">/v1/recall</span><span
+                class="ep-desc" data-i18n="ep_r1">Task context recall</span></div>
             <pre class="code-block"><code><span class="c">// Request</span>
 {
   <span class="key">"task"</span>: <span class="str">"Implement user registration with email verification"</span>,
@@ -398,27 +488,40 @@
   <span class="key">"tokenEstimate"</span>: <span class="num">1420</span>,
   <span class="key">"truncated"</span>: <span class="bool">false</span>
 }</code></pre>
-            <div class="endpoint mt"><span class="method get">GET</span><span class="path">/v1/memories/recent</span><span class="ep-desc" data-i18n="ep_r2">Latest stable memories</span></div>
+            <div class="endpoint mt"><span class="method get">GET</span><span
+                class="path">/v1/memories/recent</span><span class="ep-desc" data-i18n="ep_r2">Latest stable
+                memories</span></div>
             <pre class="code-block"><code>GET /v1/memories/recent?projectId=p_demo&amp;limit=10</code></pre>
           </div>
 
           <div class="api-panel" id="tab-control">
-            <div class="endpoint"><span class="method get">GET</span><span class="path">/v1/memories</span><span class="ep-desc" data-i18n="ep_c1">List memories with filters</span></div>
-            <pre class="code-block"><code>GET /v1/memories?projectId=p_demo&status=active&memoryType=project_rule&hasConflict=false&page=1&size=20</code></pre>
-            <div class="endpoint mt"><span class="method patch">PATCH</span><span class="path">/v1/memories/{id}/status</span><span class="ep-desc" data-i18n="ep_c2">Change memory state</span></div>
+            <div class="endpoint"><span class="method get">GET</span><span class="path">/v1/memories</span><span
+                class="ep-desc" data-i18n="ep_c1">List memories with filters</span></div>
+            <pre
+              class="code-block"><code>GET /v1/memories?projectId=p_demo&status=active&memoryType=project_rule&hasConflict=false&page=1&size=20</code></pre>
+            <div class="endpoint mt"><span class="method patch">PATCH</span><span
+                class="path">/v1/memories/{id}/status</span><span class="ep-desc" data-i18n="ep_c2">Change memory
+                state</span></div>
             <pre class="code-block"><code>{ <span class="key">"status"</span>: <span class="str">"archived"</span> }
 <span class="c">// Valid transitions: active→archived, active→invalid, active→deleted
 // archived→active (restore), invalid→active (restore)</span></code></pre>
-            <div class="endpoint mt"><span class="method delete">DELETE</span><span class="path">/v1/memories/{id}</span><span class="ep-desc" data-i18n="ep_c3">Delete a memory</span></div>
-            <div class="endpoint mt"><span class="method get">GET</span><span class="path">/v1/memories/search</span><span class="ep-desc" data-i18n="ep_c4">Full-text search</span></div>
+            <div class="endpoint mt"><span class="method delete">DELETE</span><span
+                class="path">/v1/memories/{id}</span><span class="ep-desc" data-i18n="ep_c3">Delete a memory</span>
+            </div>
+            <div class="endpoint mt"><span class="method get">GET</span><span
+                class="path">/v1/memories/search</span><span class="ep-desc" data-i18n="ep_c4">Full-text search</span>
+            </div>
             <pre class="code-block"><code>GET /v1/memories/search?q=api+response+format&limit=20</code></pre>
           </div>
 
           <div class="api-panel" id="tab-auth">
-            <div class="endpoint"><span class="method post">POST</span><span class="path">/v1/auth/login</span><span class="ep-desc" data-i18n="ep_a1">Admin login (Session Cookie)</span></div>
+            <div class="endpoint"><span class="method post">POST</span><span class="path">/v1/auth/login</span><span
+                class="ep-desc" data-i18n="ep_a1">Admin login (Session Cookie)</span></div>
             <pre class="code-block"><code>{ <span class="key">"username"</span>: <span class="str">"admin"</span>, <span class="key">"password"</span>: <span class="str">"..."</span> }
 <span class="c">// Returns HttpOnly Session Cookie for browser clients</span></code></pre>
-            <div class="endpoint mt"><span class="method post">POST</span><span class="path">/v1/admin/tokens</span><span class="ep-desc" data-i18n="ep_a2">Create API Token (CLI/MCP)</span></div>
+            <div class="endpoint mt"><span class="method post">POST</span><span
+                class="path">/v1/admin/tokens</span><span class="ep-desc" data-i18n="ep_a2">Create API Token
+                (CLI/MCP)</span></div>
             <pre class="code-block"><code>{
   <span class="key">"name"</span>: <span class="str">"Claude MCP"</span>,
   <span class="key">"clientType"</span>: <span class="str">"mcp"</span>,
@@ -426,7 +529,9 @@
   <span class="key">"expiresInDays"</span>: <span class="num">30</span>
 }
 <span class="c">// Plaintext token returned only once on creation</span></code></pre>
-            <div class="endpoint mt"><span class="method post">POST</span><span class="path">/v1/admin/tokens/{id}/revoke</span><span class="ep-desc" data-i18n="ep_a3">Revoke token immediately</span></div>
+            <div class="endpoint mt"><span class="method post">POST</span><span
+                class="path">/v1/admin/tokens/{id}/revoke</span><span class="ep-desc" data-i18n="ep_a3">Revoke token
+                immediately</span></div>
           </div>
 
         </div>
@@ -434,7 +539,8 @@
       <div class="error-codes reveal">
         <h4 data-i18n="ec_h4">Error code structure</h4>
         <div class="ec-grid">
-          <div class="ec-item"><code>MEM-AUTH*</code><span data-i18n="ec1">Authentication &amp; authorization</span></div>
+          <div class="ec-item"><code>MEM-AUTH*</code><span data-i18n="ec1">Authentication &amp; authorization</span>
+          </div>
           <div class="ec-item"><code>MEM-MEM*</code><span data-i18n="ec2">Memory operation errors</span></div>
           <div class="ec-item"><code>MEM-RECALL*</code><span data-i18n="ec3">Recall pipeline errors</span></div>
           <div class="ec-item"><code>MEM-JUDGE*</code><span data-i18n="ec4">Judge / LLM provider errors</span></div>
@@ -521,10 +627,16 @@ MEMORY_LLM_BASE_URL=https://api.openai.com/v1</code></pre>
           <div class="di-card repos reveal">
             <h4 data-i18n="di4">Four-repo structure</h4>
             <div class="repo-list">
-              <div class="repo"><span class="repo-lang java">Java</span><span class="repo-name">memory-server</span><span class="repo-desc" data-i18n="r1_d">Core business logic &amp; API</span></div>
-              <div class="repo"><span class="repo-lang ts">TS</span><span class="repo-name">client-shared</span><span class="repo-desc" data-i18n="r2_d">CLI + MCP Server adapter</span></div>
-              <div class="repo"><span class="repo-lang react">React</span><span class="repo-name">memory-web</span><span class="repo-desc" data-i18n="r3_d">Admin &amp; debug console</span></div>
-              <div class="repo"><span class="repo-lang docker">🐳</span><span class="repo-name">memory-deploy</span><span class="repo-desc" data-i18n="r4_d">Compose + proxy configs</span></div>
+              <div class="repo"><span class="repo-lang java">Java</span><span
+                  class="repo-name">memory-server</span><span class="repo-desc" data-i18n="r1_d">Core business logic
+                  &amp; API</span></div>
+              <div class="repo"><span class="repo-lang ts">TS</span><span class="repo-name">client-shared</span><span
+                  class="repo-desc" data-i18n="r2_d">CLI + MCP Server adapter</span></div>
+              <div class="repo"><span class="repo-lang react">React</span><span class="repo-name">memory-web</span><span
+                  class="repo-desc" data-i18n="r3_d">Admin &amp; debug console</span></div>
+              <div class="repo"><span class="repo-lang docker">🐳</span><span
+                  class="repo-name">memory-deploy</span><span class="repo-desc" data-i18n="r4_d">Compose + proxy
+                  configs</span></div>
             </div>
           </div>
         </div>
@@ -575,4 +687,5 @@ MEMORY_LLM_BASE_URL=https://api.openai.com/v1</code></pre>
   <script src="js/i18n.js"></script>
   <script src="js/main.js"></script>
 </body>
+
 </html>
