@@ -1,0 +1,5105 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "羽忆 Memory Server API",
+    "description": "统一云记忆基础设施 REST API —— 为多 Agent 提供统一长期记忆服务。\n\n文档说明：\n- 记忆读写接口默认支持 `Authorization: Bearer {token}` 或管理员 Session Cookie\n- `/v1/admin/**` 和 `/v1/auth/me`、`/v1/auth/logout` 仅允许管理员 Session 访问\n- `/v1/auth/login` 用用户名密码登录，成功后服务端会写入 `JSESSIONID` HttpOnly Cookie\n- 所有接口统一返回 `{code, message, data, httpStatus, timestamp}` 结构\n- `code` 是稳定业务码，成功固定为 `SUCCESS / CREATED`，失败为 `MEM-*`\n- 列表、搜索、最近记忆接口返回摘要模型；详情接口返回完整对象\n- `scope.userId` 由服务端按当前登录用户校验，不能借请求体伪造其他用户\n",
+    "contact": {
+      "name": "zyaire",
+      "url": "https://github.com/zyaire"
+    },
+    "version": "v1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "本地开发环境"
+    },
+    {
+      "url": "/",
+      "description": "当前部署环境"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Recall",
+      "description": "记忆召回接口"
+    },
+    {
+      "name": "Admin Judge Rules",
+      "description": "管理员 Judge 规则配置接口"
+    },
+    {
+      "name": "Admin Embedding Providers",
+      "description": "管理员 embedding provider 管理接口"
+    },
+    {
+      "name": "Search",
+      "description": "记忆搜索接口"
+    },
+    {
+      "name": "Admin Audit",
+      "description": "管理员审计查询接口"
+    },
+    {
+      "name": "Auth",
+      "description": "管理员登录接口"
+    },
+    {
+      "name": "Health",
+      "description": "服务健康检查"
+    },
+    {
+      "name": "History Records",
+      "description": "历史材料管理接口"
+    },
+    {
+      "name": "Memory Control",
+      "description": "稳定记忆管理接口"
+    },
+    {
+      "name": "Admin Tokens",
+      "description": "管理员 Token 管理接口"
+    },
+    {
+      "name": "Settings",
+      "description": "用户设置接口（模式管理）"
+    },
+    {
+      "name": "Write",
+      "description": "记忆写入接口"
+    },
+    {
+      "name": "Admin LLM Providers",
+      "description": "管理员 LLM provider 管理接口"
+    },
+    {
+      "name": "Dashboard",
+      "description": "记忆管理台概览接口"
+    }
+  ],
+  "paths": {
+    "/v1/auth/bootstrap-status": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "查看管理员初始化状态",
+        "description": "用于前端判断系统是否已经完成首个管理员初始化",
+        "operationId": "bootstrapStatus",
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBootstrapStatusResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "查看管理员初始化状态",
+        "description": "用于前端判断系统是否已经完成首个管理员初始化",
+        "operationId": "bootstrapStatus_1",
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBootstrapStatusResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/settings/mode": {
+      "put": {
+        "tags": [
+          "Settings"
+        ],
+        "summary": "切换运行模式",
+        "description": "mode 可选值：manual | assistive | temporary\n- temporary 模式下所有写入请求返回 403\n- expiresInMin：临时模式时长（分钟），不传则永久",
+        "operationId": "changeMode",
+        "requestBody": {
+          "description": "模式切换请求",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeMemoryModeRequest"
+              },
+              "examples": {
+                "切到 temporary": {
+                  "description": "切到 temporary",
+                  "value": {
+                    "mode": "temporary",
+                    "expiresInMin": 30
+                  }
+                },
+                "切到 manual": {
+                  "description": "切到 manual",
+                  "value": {
+                    "mode": "manual"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "请求参数不合法",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserSettingsResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "切换成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserSettingsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未提供有效认证凭证",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserSettingsResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/settings/auto-write": {
+      "get": {
+        "tags": [
+          "Settings"
+        ],
+        "summary": "查看自动写入状态",
+        "description": "返回当前用户的完整设置对象，其中 autoWrite 字段表示自动写入开关",
+        "operationId": "getAutoWrite",
+        "responses": {
+          "401": {
+            "description": "未提供有效认证凭证",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserSettingsResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserSettingsResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Settings"
+        ],
+        "summary": "切换自动写入开关",
+        "description": "仅在 assistive 模式下有实际效果。manual / temporary 模式下即使设置成功，也不会触发自动写入流程",
+        "operationId": "setAutoWrite",
+        "requestBody": {
+          "description": "自动写入开关请求",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetAutoWriteRequest"
+              },
+              "example": {
+                "autoWrite": true
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "请求参数不合法",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserSettingsResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "切换成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserSettingsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未提供有效认证凭证",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserSettingsResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/admin/llm-providers/{id}": {
+      "put": {
+        "tags": [
+          "Admin LLM Providers"
+        ],
+        "summary": "更新 LLM provider 配置",
+        "operationId": "update",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateLlmProviderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseLlmProviderResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminSession": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Admin LLM Providers"
+        ],
+        "summary": "删除某个 LLM provider",
+        "operationId": "delete_2",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminSession": []
+          }
+        ]
+      }
+    },
+    "/v1/admin/judge-rules/{id}": {
+      "put": {
+        "tags": [
+          "Admin Judge Rules"
+        ],
+        "summary": "更新某条 Judge 规则配置",
+        "operationId": "update_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateJudgeRuleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseJudgeRuleResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminSession": []
+          }
+        ]
+      }
+    },
+    "/v1/admin/embedding-providers/{id}": {
+      "put": {
+        "tags": [
+          "Admin Embedding Providers"
+        ],
+        "summary": "更新 embedding provider 配置",
+        "operationId": "update_2",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEmbeddingProviderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseEmbeddingProviderResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminSession": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Admin Embedding Providers"
+        ],
+        "summary": "删除某个 embedding provider",
+        "operationId": "delete_3",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminSession": []
+          }
+        ]
+      }
+    },
+    "/v1/recall": {
+      "post": {
+        "tags": [
+          "Recall"
+        ],
+        "summary": "任务上下文召回",
+        "description": "为当前任务生成最佳上下文注入块（Recall Context Block）。这不是普通搜索接口，而是带排序、去重、冲突提示和 Token 预算控制的任务级召回",
+        "operationId": "recall",
+        "requestBody": {
+          "description": "召回请求。`scope.userId` 可以省略并由服务端按当前登录用户补全；显式伪造其他用户会被拒绝",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecallRequest"
+              },
+              "example": {
+                "task": "实现用户注册模块，需要发送验证码邮件",
+                "scope": {
+                  "projectId": "p_demo"
+                },
+                "maxTokens": 2000,
+                "prefer": "stable_first",
+                "includeHistory": true
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "403": {
+            "description": "当前用户无权访问该 scope",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseRecallContextBlock"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数不合法，或 Token 预算过小",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseRecallContextBlock"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未提供有效认证凭证",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseRecallContextBlock"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "召回成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseRecallContextBlock"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/memories": {
+      "get": {
+        "tags": [
+          "Memory Control"
+        ],
+        "summary": "列出记忆",
+        "description": "按当前登录用户和可选项目维度分页查询稳定记忆。返回摘要模型，不包含完整 content",
+        "operationId": "list",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "query",
+            "description": "项目 ID。不传时返回当前用户下所有项目的稳定记忆",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "p_demo"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "状态过滤。默认 active",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "active"
+          },
+          {
+            "name": "memoryType",
+            "in": "query",
+            "description": "记忆类型过滤",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "project_rule"
+          },
+          {
+            "name": "hasConflict",
+            "in": "query",
+            "description": "是否只看冲突候选",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "example": true
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "页码，从 1 开始",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            },
+            "example": 1
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "每页条数",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            },
+            "example": 20
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "未提供有效认证凭证",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListMemorySummaryResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListMemorySummaryResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Write"
+        ],
+        "summary": "写入稳定记忆",
+        "description": "将信息写入 Stable Memory Store。请求会先经过 Scope 校验、临时模式检查和 Memory Judge 判断，再决定是否真正入库",
+        "operationId": "writeMemory",
+        "requestBody": {
+          "description": "稳定记忆写入请求。`scope.userId` 可以省略，服务端会按当前登录用户补全；如果显式传入其他用户，会被拒绝",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WriteMemoryRequest"
+              },
+              "example": {
+                "content": "所有后端接口统一返回 {code, message, data, httpStatus} 结构，不允许裸返回",
+                "title": "后端响应格式约定",
+                "memoryType": "project_rule",
+                "scope": {
+                  "projectId": "p_demo"
+                },
+                "source": {
+                  "agent": "codex",
+                  "origin": "manual",
+                  "adapter": "cli",
+                  "timestamp": "2026-04-05T10:30:00Z"
+                },
+                "tags": [
+                  "api",
+                  "规范"
+                ],
+                "semanticKey": "p_demo:api:response_format",
+                "importance": 0.9
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "403": {
+            "description": "当前用户无权写入该 scope，或处于 temporary 模式",
+            "content": {
+              "*/*": {
+                "example": {
+                  "code": "MEM-MEM006",
+                  "message": "临时模式已开启，写入被阻止",
+                  "httpStatus": 403,
+                  "timestamp": 1775326400123
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数不合法，或被 Judge 拒绝",
+            "content": {
+              "*/*": {
+                "example": {
+                  "code": "MEM-SYS003",
+                  "message": "参数校验失败：memoryType 不能为空",
+                  "httpStatus": 400,
+                  "timestamp": 1775326400123
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未提供有效认证凭证",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseMemoryResponse"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "写入成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseMemoryResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/memories/search": {
+      "get": {
+        "tags": [
+          "Memory Control"
+        ],
+        "summary": "搜索记忆",
+        "description": "仅搜索稳定记忆的轻量全文检索接口。需要同时搜索历史材料时，请使用 POST /v1/memories/search",
+        "operationId": "search_1",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "关键词",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "接口格式"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "最大返回条数",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            },
+            "example": 20
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "未提供有效认证凭证",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListMemorySummaryResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListMemorySummaryResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Search"
+        ],
+        "summary": "综合搜索",
+        "description": "对稳定记忆和历史材料进行综合搜索。和 GET /v1/memories/search 相比，这个接口会同时返回两类结果",
+        "operationId": "search",
+        "requestBody": {
+          "description": "综合搜索请求",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchMemoryRequest"
+              },
+              "example": {
+                "query": "接口格式",
+                "projectId": "p_demo",
+                "limit": 20
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "请求参数不合法",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseSearchResultResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未提供有效认证凭证",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseSearchResultResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseSearchResultResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/history-records": {
+      "get": {
+        "tags": [
+          "History Records"
+        ],
+        "summary": "列出历史材料",
+        "description": "分页查看当前用户的历史材料摘要。适合做最近进展回看和任务轨迹浏览",
+        "operationId": "list_1",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "query",
+            "description": "项目 ID。不传时返回当前用户所有项目的历史材料",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "p_demo"
+          },
+          {
+            "name": "recordKind",
+            "in": "query",
+            "description": "材料类型过滤",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "task_summary"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "页码，从 1 开始",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            },
+            "example": 1
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "每页条数",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            },
+            "example": 20
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "未提供有效认证凭证",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListHistoryRecordSummaryResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListHistoryRecordSummaryResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Write"
+        ],
+        "summary": "写入历史材料",
+        "description": "将任务过程性材料写入 History Recall Store。适合存放任务总结、决策轨迹、近期进展等过程信息",
+        "operationId": "writeHistory",
+        "requestBody": {
+          "description": "历史材料写入请求。和稳定记忆不同，这类数据更偏过程性，通常配合召回或回顾使用",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WriteHistoryRequest"
+              },
+              "example": {
+                "content": "完成了用户注册模块，发送验证码邮件使用 MailCodeService，TTL 5 分钟",
+                "title": "用户注册模块完成总结",
+                "summary": "验证码邮件链路已完成，MailCodeService 负责 TTL 控制",
+                "recordKind": "task_summary",
+                "scope": {
+                  "projectId": "p_demo"
+                },
+                "source": {
+                  "agent": "codex",
+                  "origin": "manual",
+                  "adapter": "cli"
+                },
+                "sourceRefs": [
+                  "session_888#msg_12"
+                ],
+                "tags": [
+                  "register",
+                  "mail"
+                ],
+                "ttlPolicy": "365d"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "请求参数不合法",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseHistoryRecordResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "当前用户无权写入该 scope，或处于 temporary 模式",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseHistoryRecordResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未提供有效认证凭证",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseHistoryRecordResponse"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "写入成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseHistoryRecordResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/auth/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "管理员登出",
+        "description": "清理当前浏览器登录态",
+        "operationId": "logout",
+        "responses": {
+          "200": {
+            "description": "登出成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "当前没有有效的管理员 Session",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminSession": []
+          }
+        ]
+      }
+    },
+    "/v1/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "管理员登录",
+        "description": "校验用户名密码，成功后写入 HttpOnly Session Cookie。后续浏览器请求可以直接依赖 Session，不必再手动带 Bearer Token。",
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              },
+              "example": {
+                "username": "admin",
+                "password": "change-me"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "401": {
+            "description": "用户名或密码错误",
+            "content": {
+              "*/*": {
+                "example": {
+                  "code": "MEM-AUTH005",
+                  "message": "用户名或密码错误",
+                  "httpStatus": 401,
+                  "timestamp": 1775326400123
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "登录成功，返回管理员信息并写入 Session Cookie",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAuthMeResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数不合法",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAuthMeResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/admin/tokens": {
+      "get": {
+        "tags": [
+          "Admin Tokens"
+        ],
+        "summary": "列出当前用户所有 Token",
+        "description": "仅管理员登录态可访问。这里只返回 token 前缀和元信息，不会回显明文 token。",
+        "operationId": "list_2",
+        "responses": {
+          "401": {
+            "description": "必须使用管理员 Session 访问",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListApiTokenSummaryResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListApiTokenSummaryResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminSession": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Admin Tokens"
+        ],
+        "summary": "创建 Token",
+        "description": "成功时只返回一次明文 token，后续接口不会再回显。`read_only` 只能调用读接口，`read_write` 可读写。`expiresInDays\u003d0` 表示永不过期。",
+        "operationId": "create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateApiTokenRequest"
+              },
+              "examples": {
+                "创建 CLI 读写 Token": {
+                  "description": "创建 CLI 读写 Token",
+                  "value": {
+                    "name": "本地 CLI",
+                    "clientType": "cli",
+                    "accessLevel": "read_write",
+                    "expiresInDays": 365
+                  }
+                },
+                "创建 MCP 只读 Token": {
+                  "description": "创建 MCP 只读 Token",
+                  "value": {
+                    "name": "Claude MCP",
+                    "clientType": "mcp",
+                    "accessLevel": "read_only",
+                    "expiresInDays": 30
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "请求参数不合法",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCreatedApiTokenResponse"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "创建成功，返回一次性明文 token",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCreatedApiTokenResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "必须使用管理员 Session 访问",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCreatedApiTokenResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminSession": []
+          }
+        ]
+      }
+    },
+    "/v1/admin/tokens/{id}/revoke": {
+      "post": {
+        "tags": [
+          "Admin Tokens"
+        ],
+        "summary": "吊销 Token",
+        "description": "吊销后该 token 会立即失效，CLI / MCP 再使用时会收到 401。",
+        "operationId": "revoke",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "吊销成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "必须使用管理员 Session 访问",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Token 不存在或不属于当前用户",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminSession": []
+          }
+        ]
+      }
+    },
+    "/v1/admin/llm-providers": {
+      "get": {
+        "tags": [
+          "Admin LLM Providers"
+        ],
+        "summary": "列出所有 LLM provider 配置",
+        "operationId": "list_3",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListLlmProviderResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminSession": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Admin LLM Providers"
+        ],
+        "summary": "新增 LLM provider 配置",
+        "operationId": "create_1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLlmProviderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseLlmProviderResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminSession": []
+          }
+        ]
+      }
+    },
+    "/v1/admin/llm-providers/{id}/enable": {
+      "post": {
+        "tags": [
+          "Admin LLM Providers"
+        ],
+        "summary": "启用某个 LLM provider",
+        "operationId": "enable",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminSession": []
+          }
+        ]
+      }
+    },
+    "/v1/admin/llm-providers/{id}/disable": {
+      "post": {
+        "tags": [
+          "Admin LLM Providers"
+        ],
+        "summary": "停用某个 LLM provider",
+        "operationId": "disable",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminSession": []
+          }
+        ]
+      }
+    },
+    "/v1/admin/llm-providers/{id}/activate": {
+      "post": {
+        "tags": [
+          "Admin LLM Providers"
+        ],
+        "summary": "激活某个 LLM provider",
+        "operationId": "activate",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminSession": []
+          }
+        ]
+      }
+    },
+    "/v1/admin/llm-providers/test": {
+      "post": {
+        "tags": [
+          "Admin LLM Providers"
+        ],
+        "summary": "测试 LLM provider 连通性",
+        "operationId": "test",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestLlmProviderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "测试完成",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseLlmProviderTestResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "必须使用管理员 Session 访问",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseLlmProviderTestResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminSession": []
+          }
+        ]
+      }
+    },
+    "/v1/admin/embedding-providers": {
+      "get": {
+        "tags": [
+          "Admin Embedding Providers"
+        ],
+        "summary": "列出所有 embedding provider 配置",
+        "operationId": "list_5",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListEmbeddingProviderResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminSession": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Admin Embedding Providers"
+        ],
+        "summary": "新增 embedding provider 配置",
+        "operationId": "create_2",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEmbeddingProviderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseEmbeddingProviderResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminSession": []
+          }
+        ]
+      }
+    },
+    "/v1/admin/embedding-providers/{id}/enable": {
+      "post": {
+        "tags": [
+          "Admin Embedding Providers"
+        ],
+        "summary": "启用某个 embedding provider",
+        "operationId": "enable_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminSession": []
+          }
+        ]
+      }
+    },
+    "/v1/admin/embedding-providers/{id}/disable": {
+      "post": {
+        "tags": [
+          "Admin Embedding Providers"
+        ],
+        "summary": "停用某个 embedding provider",
+        "operationId": "disable_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminSession": []
+          }
+        ]
+      }
+    },
+    "/v1/admin/embedding-providers/{id}/activate": {
+      "post": {
+        "tags": [
+          "Admin Embedding Providers"
+        ],
+        "summary": "激活某个 embedding provider",
+        "operationId": "activate_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminSession": []
+          }
+        ]
+      }
+    },
+    "/v1/admin/embedding-providers/test": {
+      "post": {
+        "tags": [
+          "Admin Embedding Providers"
+        ],
+        "summary": "测试 embedding provider 连通性",
+        "operationId": "test_1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestEmbeddingProviderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "测试完成",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseEmbeddingProviderTestResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "必须使用管理员 Session 访问",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseEmbeddingProviderTestResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminSession": []
+          }
+        ]
+      }
+    },
+    "/v1/memories/{id}/status": {
+      "patch": {
+        "tags": [
+          "Memory Control"
+        ],
+        "summary": "变更记忆状态",
+        "description": "修改记忆状态。常见用法包括：归档旧约定、标记失效事实、恢复误归档的记录",
+        "operationId": "changeStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "记忆 ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "mem_01HSX9Q8Y3W5A7B9C1D2E3F4G5"
+          }
+        ],
+        "requestBody": {
+          "description": "目标状态",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeMemoryStatusRequest"
+              },
+              "example": {
+                "status": "archived"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "404": {
+            "description": "记忆不存在",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseMemoryResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "当前用户无权修改该记忆",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseMemoryResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "修改成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseMemoryResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "状态值非法，或状态转换不允许",
+            "content": {
+              "*/*": {
+                "example": {
+                  "code": "MEM-MEM003",
+                  "message": "非法的状态转换",
+                  "httpStatus": 400,
+                  "timestamp": 1775326400123
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未提供有效认证凭证",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseMemoryResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/settings": {
+      "get": {
+        "tags": [
+          "Settings"
+        ],
+        "summary": "查看当前设置",
+        "description": "返回当前用户的模式配置和自动写入设置",
+        "operationId": "getSettings",
+        "responses": {
+          "401": {
+            "description": "未提供有效认证凭证",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserSettingsResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserSettingsResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/memories/{id}": {
+      "get": {
+        "tags": [
+          "Memory Control"
+        ],
+        "summary": "查看记忆详情",
+        "description": "按 ID 获取一条稳定记忆的完整详情，包含 content、scope、source 等完整字段",
+        "operationId": "getById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "记忆 ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "mem_01HSX9Q8Y3W5A7B9C1D2E3F4G5"
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "记忆不存在",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseMemoryResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "当前用户无权访问这条记忆",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseMemoryResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未提供有效认证凭证",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseMemoryResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseMemoryResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Memory Control"
+        ],
+        "summary": "删除记忆",
+        "description": "删除一条稳定记忆。删除后列表和最近记忆接口都不应再返回该记录",
+        "operationId": "delete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "记忆 ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "mem_01HSX9Q8Y3W5A7B9C1D2E3F4G5"
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "记忆不存在",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "当前用户无权删除该记忆",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "删除成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未提供有效认证凭证",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/memories/recent": {
+      "get": {
+        "tags": [
+          "Recall"
+        ],
+        "summary": "最近记忆快速查询",
+        "description": "返回当前用户最近的稳定记忆列表，按 updated_at 降序",
+        "operationId": "getRecentMemories",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "query",
+            "description": "项目 ID（可选，不传则查询所有项目）",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "返回条数上限，最多 50",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            },
+            "example": 10
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "未提供有效认证凭证",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListMemorySummaryResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListMemorySummaryResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/history-records/{id}": {
+      "get": {
+        "tags": [
+          "History Records"
+        ],
+        "summary": "查看历史材料详情",
+        "description": "按 ID 获取历史材料完整内容，包括来源、引用、TTL 和过期时间",
+        "operationId": "getById_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "历史材料 ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "his_01HSX9V8Q7W6A5B4C3D2E1F0G9"
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "历史材料不存在",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseHistoryRecordResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "当前用户无权访问这条历史材料",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseHistoryRecordResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未提供有效认证凭证",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseHistoryRecordResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseHistoryRecordResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "History Records"
+        ],
+        "summary": "删除历史材料",
+        "description": "删除一条历史材料。该操作不会影响稳定记忆",
+        "operationId": "delete_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "历史材料 ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "his_01HSX9V8Q7W6A5B4C3D2E1F0G9"
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "历史材料不存在",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "删除成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未提供有效认证凭证",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "当前用户无权删除该历史材料",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/history-records/recent": {
+      "get": {
+        "tags": [
+          "History Records"
+        ],
+        "summary": "获取最近历史材料",
+        "description": "快速获取最近写入或更新的历史材料摘要",
+        "operationId": "recent",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "query",
+            "description": "项目 ID。不传时按当前用户全局查询",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "p_demo"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "返回条数",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            },
+            "example": 10
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "未提供有效认证凭证",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListHistoryRecordSummaryResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListHistoryRecordSummaryResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/health": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "summary": "健康检查",
+        "description": "返回服务运行状态。该接口不需要认证，适合部署探针和本地连通性检查",
+        "operationId": "health",
+        "responses": {
+          "200": {
+            "description": "服务可用",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "SUCCESS",
+                  "message": "success",
+                  "data": {
+                    "status": "UP",
+                    "service": "memory-server",
+                    "version": "v1.0.0"
+                  },
+                  "httpStatus": 200,
+                  "timestamp": 1775326400123
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/dashboard/overview": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "summary": "获取仪表盘概览",
+        "description": "返回首页所需的总量、最近活动和最近 7 天写入趋势",
+        "operationId": "getOverview",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "query",
+            "description": "项目 ID。不传时返回当前用户全局概览",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "p_demo"
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "未提供有效认证凭证",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDashboardOverviewResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDashboardOverviewResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/auth/me": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "获取当前管理员信息",
+        "description": "仅管理员登录态可访问",
+        "operationId": "me",
+        "responses": {
+          "401": {
+            "description": "当前没有有效的管理员 Session",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAuthMeResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAuthMeResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminSession": []
+          }
+        ]
+      }
+    },
+    "/v1/admin/tokens/{id}/activity": {
+      "get": {
+        "tags": [
+          "Admin Tokens"
+        ],
+        "summary": "查询 Token 活动",
+        "description": "返回该 token 关联的审计事件，重点用于排查它何时写入了哪些记忆。",
+        "operationId": "activity",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "必须使用管理员 Session 访问",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListAuditEventResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListAuditEventResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Token 不存在或不属于当前用户",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListAuditEventResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminSession": []
+          }
+        ]
+      }
+    },
+    "/v1/admin/memories/{id}/activity": {
+      "get": {
+        "tags": [
+          "Admin Audit"
+        ],
+        "summary": "查询稳定记忆相关审计",
+        "description": "用于回溯某条稳定记忆由谁在什么时候创建、删除或修改状态。",
+        "operationId": "memoryActivity",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "必须使用管理员 Session 访问",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListAuditEventResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListAuditEventResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminSession": []
+          }
+        ]
+      }
+    },
+    "/v1/admin/llm-providers/effective": {
+      "get": {
+        "tags": [
+          "Admin LLM Providers"
+        ],
+        "summary": "查看当前生效的 LLM Judge 配置来源",
+        "operationId": "effective",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseEffectiveLlmProviderResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminSession": []
+          }
+        ]
+      }
+    },
+    "/v1/admin/judge-rules": {
+      "get": {
+        "tags": [
+          "Admin Judge Rules"
+        ],
+        "summary": "列出 Judge 规则配置",
+        "operationId": "list_4",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListJudgeRuleResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminSession": []
+          }
+        ]
+      }
+    },
+    "/v1/admin/history-records/{id}/activity": {
+      "get": {
+        "tags": [
+          "Admin Audit"
+        ],
+        "summary": "查询历史材料相关审计",
+        "description": "用于回溯某条历史材料由谁在什么时候创建或删除。",
+        "operationId": "historyActivity",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "必须使用管理员 Session 访问",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListAuditEventResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListAuditEventResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminSession": []
+          }
+        ]
+      }
+    },
+    "/v1/admin/embedding-providers/effective": {
+      "get": {
+        "tags": [
+          "Admin Embedding Providers"
+        ],
+        "summary": "查看当前生效的 embedding 配置来源",
+        "operationId": "effective_1",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseEffectiveEmbeddingProviderResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminSession": []
+          }
+        ]
+      }
+    },
+    "/v1/admin/audit/events": {
+      "get": {
+        "tags": [
+          "Admin Audit"
+        ],
+        "summary": "查询审计事件",
+        "description": "按动作、actor 类型、token、目标对象和时间区间筛选审计事件。第一版重点覆盖登录、Token 生命周期和写操作。",
+        "operationId": "query",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AuditEventQuery"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "必须使用管理员 Session 访问",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListAuditEventResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListAuditEventResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminSession": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiResponseBootstrapStatusResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "稳定业务码。成功固定为 SUCCESS / CREATED，失败为 MEM-* 业务错误码",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应说明，供人阅读；调用方应优先根据 code 分支，而不是依赖 message 文案",
+            "example": "success"
+          },
+          "data": {
+            "$ref": "#/components/schemas/BootstrapStatusResponse"
+          },
+          "httpStatus": {
+            "type": "integer",
+            "description": "HTTP 状态语义的镜像字段，便于日志和接入层统一处理",
+            "format": "int32",
+            "example": 200
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "服务端响应时间戳（Epoch 毫秒）",
+            "format": "int64",
+            "example": 1775326400123
+          }
+        },
+        "description": "统一响应包装"
+      },
+      "BootstrapStatusResponse": {
+        "type": "object",
+        "properties": {
+          "initialized": {
+            "type": "boolean",
+            "description": "是否已经至少存在一个管理员账号",
+            "example": true
+          }
+        },
+        "description": "管理员引导初始化状态"
+      },
+      "ChangeMemoryModeRequest": {
+        "required": [
+          "mode"
+        ],
+        "type": "object",
+        "properties": {
+          "mode": {
+            "type": "string",
+            "description": "目标模式",
+            "example": "temporary",
+            "enum": [
+              "manual",
+              "assistive",
+              "temporary"
+            ]
+          },
+          "expiresInMin": {
+            "type": "integer",
+            "description": "临时模式时长（分钟）",
+            "format": "int32",
+            "example": 30
+          }
+        },
+        "description": "运行模式切换请求"
+      },
+      "ApiResponseUserSettingsResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "稳定业务码。成功固定为 SUCCESS / CREATED，失败为 MEM-* 业务错误码",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应说明，供人阅读；调用方应优先根据 code 分支，而不是依赖 message 文案",
+            "example": "success"
+          },
+          "data": {
+            "$ref": "#/components/schemas/UserSettingsResponse"
+          },
+          "httpStatus": {
+            "type": "integer",
+            "description": "HTTP 状态语义的镜像字段，便于日志和接入层统一处理",
+            "format": "int32",
+            "example": 200
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "服务端响应时间戳（Epoch 毫秒）",
+            "format": "int64",
+            "example": 1775326400123
+          }
+        },
+        "description": "统一响应包装"
+      },
+      "UserSettingsResponse": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "description": "当前用户 ID",
+            "example": "u_001"
+          },
+          "memoryMode": {
+            "type": "string",
+            "description": "当前记忆模式",
+            "example": "manual"
+          },
+          "autoWrite": {
+            "type": "boolean",
+            "description": "自动写入开关",
+            "example": false
+          },
+          "tempModeExpiresAt": {
+            "type": "string",
+            "description": "临时模式过期时间；仅 temporary 模式且设置了时长时返回",
+            "format": "date-time",
+            "example": "2026-04-05T12:30:00Z"
+          },
+          "blockRules": {
+            "type": "array",
+            "description": "阻断规则列表",
+            "items": {
+              "type": "string",
+              "description": "阻断规则列表"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间",
+            "format": "date-time",
+            "example": "2026-04-05T10:00:00Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "最后更新时间",
+            "format": "date-time",
+            "example": "2026-04-05T10:30:00Z"
+          }
+        },
+        "description": "用户设置响应"
+      },
+      "SetAutoWriteRequest": {
+        "required": [
+          "autoWrite"
+        ],
+        "type": "object",
+        "properties": {
+          "autoWrite": {
+            "type": "boolean",
+            "description": "自动写入开关",
+            "example": true
+          }
+        },
+        "description": "自动写入开关请求"
+      },
+      "UpdateLlmProviderRequest": {
+        "required": [
+          "baseUrl",
+          "model",
+          "name",
+          "providerType"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "providerType": {
+            "type": "string"
+          },
+          "baseUrl": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "apiKey": {
+            "type": "string",
+            "description": "新的 API key。为空表示保留当前已存密钥"
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "是否启用该配置",
+            "default": true
+          }
+        },
+        "description": "更新 LLM Provider 请求"
+      },
+      "ApiResponseLlmProviderResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "稳定业务码。成功固定为 SUCCESS / CREATED，失败为 MEM-* 业务错误码",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应说明，供人阅读；调用方应优先根据 code 分支，而不是依赖 message 文案",
+            "example": "success"
+          },
+          "data": {
+            "$ref": "#/components/schemas/LlmProviderResponse"
+          },
+          "httpStatus": {
+            "type": "integer",
+            "description": "HTTP 状态语义的镜像字段，便于日志和接入层统一处理",
+            "format": "int32",
+            "example": 200
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "服务端响应时间戳（Epoch 毫秒）",
+            "format": "int64",
+            "example": 1775326400123
+          }
+        },
+        "description": "统一响应包装"
+      },
+      "LlmProviderResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "providerType": {
+            "type": "string"
+          },
+          "baseUrl": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "apiKeyMasked": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "isDefault": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "description": "LLM Provider 配置概览"
+      },
+      "UpdateJudgeRuleRequest": {
+        "required": [
+          "configJson",
+          "enabled",
+          "priority"
+        ],
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "priority": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "configJson": {
+            "type": "string"
+          }
+        },
+        "description": "更新 Judge 规则请求"
+      },
+      "ApiResponseJudgeRuleResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "稳定业务码。成功固定为 SUCCESS / CREATED，失败为 MEM-* 业务错误码",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应说明，供人阅读；调用方应优先根据 code 分支，而不是依赖 message 文案",
+            "example": "success"
+          },
+          "data": {
+            "$ref": "#/components/schemas/JudgeRuleResponse"
+          },
+          "httpStatus": {
+            "type": "integer",
+            "description": "HTTP 状态语义的镜像字段，便于日志和接入层统一处理",
+            "format": "int32",
+            "example": 200
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "服务端响应时间戳（Epoch 毫秒）",
+            "format": "int64",
+            "example": 1775326400123
+          }
+        },
+        "description": "统一响应包装"
+      },
+      "JudgeRuleResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "ruleKey": {
+            "type": "string"
+          },
+          "ruleType": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "priority": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "configJson": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "description": "Judge 规则配置概览"
+      },
+      "UpdateEmbeddingProviderRequest": {
+        "required": [
+          "baseUrl",
+          "model",
+          "name",
+          "providerType"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "providerType": {
+            "type": "string"
+          },
+          "baseUrl": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "dimensions": {
+            "maximum": 8192,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          },
+          "apiKey": {
+            "type": "string",
+            "description": "新的 API key。为空表示保留当前已存密钥",
+            "example": "sk-xxxxx"
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "是否启用该配置",
+            "default": true
+          }
+        },
+        "description": "更新 Embedding Provider 请求"
+      },
+      "ApiResponseEmbeddingProviderResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "稳定业务码。成功固定为 SUCCESS / CREATED，失败为 MEM-* 业务错误码",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应说明，供人阅读；调用方应优先根据 code 分支，而不是依赖 message 文案",
+            "example": "success"
+          },
+          "data": {
+            "$ref": "#/components/schemas/EmbeddingProviderResponse"
+          },
+          "httpStatus": {
+            "type": "integer",
+            "description": "HTTP 状态语义的镜像字段，便于日志和接入层统一处理",
+            "format": "int32",
+            "example": 200
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "服务端响应时间戳（Epoch 毫秒）",
+            "format": "int64",
+            "example": 1775326400123
+          }
+        },
+        "description": "统一响应包装"
+      },
+      "EmbeddingProviderResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "providerType": {
+            "type": "string"
+          },
+          "baseUrl": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "dimensions": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "apiKeyMasked": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "isDefault": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "description": "Embedding Provider 配置概览"
+      },
+      "RecallRequest": {
+        "required": [
+          "task"
+        ],
+        "type": "object",
+        "properties": {
+          "task": {
+            "type": "string",
+            "description": "当前任务描述（用于相关性排序）",
+            "example": "实现用户注册模块，需要发送验证码邮件"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/ScopeContext"
+          },
+          "maxTokens": {
+            "type": "integer",
+            "description": "最大 Token 预算（默认 4000）",
+            "format": "int32",
+            "example": 2000
+          },
+          "prefer": {
+            "type": "string",
+            "description": "召回偏好",
+            "example": "stable_first",
+            "enum": [
+              "stable_first",
+              "history_first",
+              "balanced",
+              "stable_only",
+              "history_only",
+              "stable_first",
+              "history_first",
+              "balanced",
+              "stable_only",
+              "history_only"
+            ]
+          },
+          "includeHistory": {
+            "type": "boolean",
+            "description": "是否包含历史材料",
+            "default": true
+          }
+        },
+        "description": "任务上下文召回请求"
+      },
+      "ScopeContext": {
+        "type": "object",
+        "properties": {
+          "tenantId": {
+            "type": "string",
+            "description": "租户 ID（多租户场景可选）",
+            "example": "t_default"
+          },
+          "userId": {
+            "type": "string",
+            "description": "用户 ID。写入和召回最终都会校验归属，不能伪造其他用户",
+            "example": "u_001"
+          },
+          "teamId": {
+            "type": "string",
+            "description": "团队 ID（可选）",
+            "example": "team_platform"
+          },
+          "projectId": {
+            "type": "string",
+            "description": "项目 ID（项目级记忆常用）",
+            "example": "p_demo"
+          },
+          "agentId": {
+            "type": "string",
+            "description": "Agent 标识（可选）",
+            "example": "codex"
+          },
+          "sessionId": {
+            "type": "string",
+            "description": "会话 ID（可选）",
+            "example": "session_20260405_001"
+          }
+        },
+        "description": "作用域上下文。MVP 阶段至少绑定当前用户，其他维度按需补充"
+      },
+      "ApiResponseRecallContextBlock": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "稳定业务码。成功固定为 SUCCESS / CREATED，失败为 MEM-* 业务错误码",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应说明，供人阅读；调用方应优先根据 code 分支，而不是依赖 message 文案",
+            "example": "success"
+          },
+          "data": {
+            "$ref": "#/components/schemas/RecallContextBlock"
+          },
+          "httpStatus": {
+            "type": "integer",
+            "description": "HTTP 状态语义的镜像字段，便于日志和接入层统一处理",
+            "format": "int32",
+            "example": 200
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "服务端响应时间戳（Epoch 毫秒）",
+            "format": "int64",
+            "example": 1775326400123
+          }
+        },
+        "description": "统一响应包装"
+      },
+      "ConflictInfo": {
+        "type": "object",
+        "properties": {
+          "memoryId1": {
+            "type": "string",
+            "description": "冲突记忆 1 的 ID",
+            "example": "mem_01HSX9AAA"
+          },
+          "memoryId2": {
+            "type": "string",
+            "description": "冲突记忆 2 的 ID",
+            "example": "mem_01HSX9BBB"
+          },
+          "description": {
+            "type": "string",
+            "description": "冲突说明",
+            "example": "同一接口返回格式存在两个互斥约定"
+          }
+        },
+        "description": "召回过程中检测到的潜在冲突"
+      },
+      "HistoryItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "历史材料 ID",
+            "example": "his_01HSX9V8Q7W6A5B4C3D2E1F0G9"
+          },
+          "kind": {
+            "type": "string",
+            "description": "历史材料类型",
+            "example": "task_summary"
+          },
+          "summary": {
+            "type": "string",
+            "description": "供模型消费的精简摘要",
+            "example": "验证码邮件链路已完成，MailCodeService 负责 TTL 控制"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间（字符串形式，用于减少上下文体积）",
+            "example": "2026-04-05T11:00:00Z"
+          }
+        },
+        "description": "召回结果中的历史材料条目"
+      },
+      "MemoryItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "记忆 ID",
+            "example": "mem_01HSX9Q8Y3W5A7B9C1D2E3F4G5"
+          },
+          "type": {
+            "type": "string",
+            "description": "记忆类型",
+            "example": "project_rule"
+          },
+          "summary": {
+            "type": "string",
+            "description": "供模型消费的精简摘要",
+            "example": "所有后端接口统一返回 {code, message, data, httpStatus} 结构"
+          },
+          "importance": {
+            "type": "number",
+            "description": "重要性评分",
+            "format": "double",
+            "example": 0.9
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "更新时间（字符串形式，用于减少上下文体积）",
+            "example": "2026-04-05T10:30:00Z"
+          }
+        },
+        "description": "召回结果中的稳定记忆条目"
+      },
+      "RecallContextBlock": {
+        "type": "object",
+        "properties": {
+          "blockType": {
+            "type": "string",
+            "description": "块类型：task_recall | project_overview | recent_context"
+          },
+          "scopeSummary": {
+            "type": "string",
+            "description": "当前召回的作用域摘要"
+          },
+          "stableMemories": {
+            "type": "array",
+            "description": "精选的稳定记忆列表",
+            "items": {
+              "$ref": "#/components/schemas/MemoryItem"
+            }
+          },
+          "historyRecords": {
+            "type": "array",
+            "description": "相关的历史材料列表",
+            "items": {
+              "$ref": "#/components/schemas/HistoryItem"
+            }
+          },
+          "conflicts": {
+            "type": "array",
+            "description": "检测到的潜在冲突",
+            "items": {
+              "$ref": "#/components/schemas/ConflictInfo"
+            }
+          },
+          "freshnessNotes": {
+            "type": "array",
+            "description": "freshness 提醒（可能过时的记忆）",
+            "items": {
+              "type": "string",
+              "description": "freshness 提醒（可能过时的记忆）"
+            }
+          },
+          "generatedAt": {
+            "type": "string",
+            "description": "生成时间",
+            "format": "date-time"
+          },
+          "tokenEstimate": {
+            "type": "integer",
+            "description": "预估 Token 数",
+            "format": "int32"
+          },
+          "truncated": {
+            "type": "boolean",
+            "description": "是否因 Token 预算被截断"
+          }
+        },
+        "description": "召回上下文块"
+      },
+      "SourceInfo": {
+        "type": "object",
+        "properties": {
+          "agent": {
+            "type": "string",
+            "description": "来源 Agent 标识",
+            "example": "codex"
+          },
+          "sessionId": {
+            "type": "string",
+            "description": "来源会话 ID",
+            "example": "session_20260405_001"
+          },
+          "origin": {
+            "type": "string",
+            "description": "来源方式",
+            "example": "manual",
+            "enum": [
+              "manual",
+              "auto",
+              "import"
+            ]
+          },
+          "adapter": {
+            "type": "string",
+            "description": "接入方式",
+            "example": "cli",
+            "enum": [
+              "skill",
+              "tool",
+              "mcp",
+              "cli",
+              "sdk"
+            ]
+          },
+          "timestamp": {
+            "type": "string",
+            "description": "来源事件时间（ISO 8601）",
+            "example": "2026-04-05T10:30:00Z"
+          }
+        },
+        "description": "来源信息，用于标记这条记忆或材料是通过哪个接入层、哪个会话产生的"
+      },
+      "WriteMemoryRequest": {
+        "required": [
+          "content",
+          "scope"
+        ],
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "完整内容",
+            "example": "所有后端接口统一返回 {code, message, data} 结构"
+          },
+          "title": {
+            "type": "string",
+            "description": "简短标题（不填则自动提取）",
+            "example": "后端响应格式约定"
+          },
+          "summary": {
+            "type": "string",
+            "description": "精简摘要（不填则截取 content 前 200 字）"
+          },
+          "memoryType": {
+            "type": "string",
+            "description": "记忆类型",
+            "example": "project_rule",
+            "enum": [
+              "preference",
+              "project_rule",
+              "decision",
+              "fact",
+              "workflow",
+              "reference",
+              "summary",
+              "preference",
+              "project_rule",
+              "decision",
+              "fact",
+              "workflow",
+              "reference",
+              "summary"
+            ]
+          },
+          "scope": {
+            "$ref": "#/components/schemas/ScopeContext"
+          },
+          "source": {
+            "$ref": "#/components/schemas/SourceInfo"
+          },
+          "tags": {
+            "type": "array",
+            "description": "标签列表",
+            "example": [
+              "api",
+              "规范"
+            ],
+            "items": {
+              "type": "string",
+              "description": "标签列表",
+              "example": "[\"api\",\"规范\"]"
+            }
+          },
+          "semanticKey": {
+            "type": "string",
+            "description": "语义聚合键（格式：{scope}:{domain}:{topic}）",
+            "example": "p_demo:api:response_format"
+          },
+          "importance": {
+            "type": "number",
+            "description": "重要性评分 0.0~1.0（不填则自动推断）",
+            "format": "double"
+          }
+        },
+        "description": "写入稳定记忆请求"
+      },
+      "ApiResponseMemoryResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "稳定业务码。成功固定为 SUCCESS / CREATED，失败为 MEM-* 业务错误码",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应说明，供人阅读；调用方应优先根据 code 分支，而不是依赖 message 文案",
+            "example": "success"
+          },
+          "data": {
+            "$ref": "#/components/schemas/MemoryResponse"
+          },
+          "httpStatus": {
+            "type": "integer",
+            "description": "HTTP 状态语义的镜像字段，便于日志和接入层统一处理",
+            "format": "int32",
+            "example": 200
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "服务端响应时间戳（Epoch 毫秒）",
+            "format": "int64",
+            "example": 1775326400123
+          }
+        },
+        "description": "统一响应包装"
+      },
+      "MemoryResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "记忆 ID",
+            "example": "mem_01HSX9Q8Y3W5A7B9C1D2E3F4G5"
+          },
+          "memoryType": {
+            "type": "string",
+            "description": "记忆类型",
+            "example": "project_rule"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/ScopeContext"
+          },
+          "title": {
+            "type": "string",
+            "description": "标题",
+            "example": "后端响应格式约定"
+          },
+          "summary": {
+            "type": "string",
+            "description": "摘要",
+            "example": "所有后端接口统一返回统一包装结构"
+          },
+          "content": {
+            "type": "string",
+            "description": "完整内容",
+            "example": "所有后端接口统一返回 {code, message, data, httpStatus} 结构，不允许裸返回"
+          },
+          "source": {
+            "$ref": "#/components/schemas/SourceInfo"
+          },
+          "tags": {
+            "type": "array",
+            "description": "标签列表",
+            "items": {
+              "type": "string",
+              "description": "标签列表"
+            }
+          },
+          "semanticKey": {
+            "type": "string",
+            "description": "语义聚合键",
+            "example": "p_demo:api:response_format"
+          },
+          "importance": {
+            "type": "number",
+            "description": "重要性评分",
+            "format": "double",
+            "example": 0.9
+          },
+          "confidence": {
+            "type": "number",
+            "description": "置信度",
+            "format": "double",
+            "example": 0.85
+          },
+          "status": {
+            "type": "string",
+            "description": "当前状态",
+            "example": "active"
+          },
+          "version": {
+            "type": "integer",
+            "description": "版本号",
+            "format": "int32",
+            "example": 1
+          },
+          "evidenceRefs": {
+            "type": "array",
+            "description": "证据引用列表",
+            "items": {
+              "type": "string",
+              "description": "证据引用列表"
+            }
+          },
+          "hasConflict": {
+            "type": "boolean",
+            "description": "是否存在冲突标记",
+            "example": false
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间",
+            "format": "date-time",
+            "example": "2026-04-05T10:20:00Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "最后更新时间",
+            "format": "date-time",
+            "example": "2026-04-05T10:30:00Z"
+          }
+        },
+        "description": "稳定记忆详情响应"
+      },
+      "SearchMemoryRequest": {
+        "required": [
+          "query"
+        ],
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "搜索关键词",
+            "example": "接口格式"
+          },
+          "projectId": {
+            "type": "string",
+            "description": "项目 ID（可选）",
+            "example": "p_demo"
+          },
+          "limit": {
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer",
+            "description": "最大返回条数",
+            "format": "int32",
+            "example": 20,
+            "default": 20
+          }
+        },
+        "description": "综合搜索请求"
+      },
+      "ApiResponseSearchResultResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "稳定业务码。成功固定为 SUCCESS / CREATED，失败为 MEM-* 业务错误码",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应说明，供人阅读；调用方应优先根据 code 分支，而不是依赖 message 文案",
+            "example": "success"
+          },
+          "data": {
+            "$ref": "#/components/schemas/SearchResultResponse"
+          },
+          "httpStatus": {
+            "type": "integer",
+            "description": "HTTP 状态语义的镜像字段，便于日志和接入层统一处理",
+            "format": "int32",
+            "example": 200
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "服务端响应时间戳（Epoch 毫秒）",
+            "format": "int64",
+            "example": 1775326400123
+          }
+        },
+        "description": "统一响应包装"
+      },
+      "HistoryRecordSummaryResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "历史材料 ID",
+            "example": "his_01HSX9V8Q7W6A5B4C3D2E1F0G9"
+          },
+          "recordKind": {
+            "type": "string",
+            "description": "材料类型",
+            "example": "task_summary"
+          },
+          "title": {
+            "type": "string",
+            "description": "标题",
+            "example": "用户注册模块完成总结"
+          },
+          "summary": {
+            "type": "string",
+            "description": "摘要",
+            "example": "完成了验证码发送链路与 TTL 控制，邮件由 MailCodeService 负责"
+          },
+          "status": {
+            "type": "string",
+            "description": "当前状态",
+            "example": "active"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间",
+            "format": "date-time",
+            "example": "2026-04-05T11:00:00Z"
+          }
+        },
+        "description": "历史材料摘要响应"
+      },
+      "MemorySummaryResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "记忆 ID",
+            "example": "mem_01HSX9Q8Y3W5A7B9C1D2E3F4G5"
+          },
+          "memoryType": {
+            "type": "string",
+            "description": "记忆类型",
+            "example": "project_rule"
+          },
+          "title": {
+            "type": "string",
+            "description": "标题",
+            "example": "后端响应格式约定"
+          },
+          "summary": {
+            "type": "string",
+            "description": "摘要",
+            "example": "所有后端接口统一返回 {code, message, data, httpStatus} 结构"
+          },
+          "importance": {
+            "type": "number",
+            "description": "重要性评分",
+            "format": "double",
+            "example": 0.9
+          },
+          "status": {
+            "type": "string",
+            "description": "当前状态",
+            "example": "active"
+          },
+          "hasConflict": {
+            "type": "boolean",
+            "description": "是否存在冲突标记",
+            "example": false
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "最后更新时间",
+            "format": "date-time",
+            "example": "2026-04-05T10:30:00Z"
+          }
+        },
+        "description": "稳定记忆摘要响应"
+      },
+      "SearchResultResponse": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "原始搜索关键词",
+            "example": "接口格式"
+          },
+          "total": {
+            "type": "integer",
+            "description": "总命中数（稳定记忆 + 历史材料）",
+            "format": "int32",
+            "example": 3
+          },
+          "memories": {
+            "type": "array",
+            "description": "命中的稳定记忆摘要列表",
+            "items": {
+              "$ref": "#/components/schemas/MemorySummaryResponse"
+            }
+          },
+          "histories": {
+            "type": "array",
+            "description": "命中的历史材料摘要列表",
+            "items": {
+              "$ref": "#/components/schemas/HistoryRecordSummaryResponse"
+            }
+          }
+        },
+        "description": "综合搜索结果"
+      },
+      "WriteHistoryRequest": {
+        "required": [
+          "content",
+          "scope",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "完整内容"
+          },
+          "title": {
+            "type": "string",
+            "description": "简短标题",
+            "example": "完成了用户注册模块重构"
+          },
+          "summary": {
+            "type": "string",
+            "description": "精简摘要"
+          },
+          "recordKind": {
+            "type": "string",
+            "description": "材料类型",
+            "example": "task_summary",
+            "enum": [
+              "task_summary",
+              "decision_trace",
+              "session_excerpt",
+              "recent_progress",
+              "incident_context",
+              "meeting_note",
+              "task_summary",
+              "decision_trace",
+              "session_excerpt",
+              "recent_progress",
+              "incident_context",
+              "meeting_note"
+            ]
+          },
+          "scope": {
+            "$ref": "#/components/schemas/ScopeContext"
+          },
+          "source": {
+            "$ref": "#/components/schemas/SourceInfo"
+          },
+          "sourceRefs": {
+            "type": "array",
+            "description": "原始会话引用列表",
+            "example": [
+              "session_888#msg_12"
+            ],
+            "items": {
+              "type": "string",
+              "description": "原始会话引用列表",
+              "example": "[\"session_888#msg_12\"]"
+            }
+          },
+          "tags": {
+            "type": "array",
+            "description": "标签列表",
+            "items": {
+              "type": "string",
+              "description": "标签列表"
+            }
+          },
+          "ttlPolicy": {
+            "type": "string",
+            "description": "TTL 策略",
+            "example": "365d",
+            "enum": [
+              "90d",
+              "365d",
+              "permanent"
+            ]
+          }
+        },
+        "description": "写入历史材料请求"
+      },
+      "ApiResponseHistoryRecordResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "稳定业务码。成功固定为 SUCCESS / CREATED，失败为 MEM-* 业务错误码",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应说明，供人阅读；调用方应优先根据 code 分支，而不是依赖 message 文案",
+            "example": "success"
+          },
+          "data": {
+            "$ref": "#/components/schemas/HistoryRecordResponse"
+          },
+          "httpStatus": {
+            "type": "integer",
+            "description": "HTTP 状态语义的镜像字段，便于日志和接入层统一处理",
+            "format": "int32",
+            "example": 200
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "服务端响应时间戳（Epoch 毫秒）",
+            "format": "int64",
+            "example": 1775326400123
+          }
+        },
+        "description": "统一响应包装"
+      },
+      "HistoryRecordResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "历史材料 ID",
+            "example": "his_01HSX9V8Q7W6A5B4C3D2E1F0G9"
+          },
+          "recordKind": {
+            "type": "string",
+            "description": "材料类型",
+            "example": "task_summary"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/ScopeContext"
+          },
+          "title": {
+            "type": "string",
+            "description": "标题",
+            "example": "用户注册模块完成总结"
+          },
+          "summary": {
+            "type": "string",
+            "description": "摘要",
+            "example": "完成了验证码发送链路与 TTL 控制"
+          },
+          "content": {
+            "type": "string",
+            "description": "完整内容",
+            "example": "完成了用户注册模块，发送验证码邮件使用 MailCodeService，TTL 5 分钟"
+          },
+          "source": {
+            "$ref": "#/components/schemas/SourceInfo"
+          },
+          "sourceRefs": {
+            "type": "array",
+            "description": "原始引用列表",
+            "items": {
+              "type": "string",
+              "description": "原始引用列表"
+            }
+          },
+          "tags": {
+            "type": "array",
+            "description": "标签列表",
+            "items": {
+              "type": "string",
+              "description": "标签列表"
+            }
+          },
+          "ttlPolicy": {
+            "type": "string",
+            "description": "TTL 策略",
+            "example": "365d"
+          },
+          "expiresAt": {
+            "type": "string",
+            "description": "过期时间",
+            "format": "date-time",
+            "example": "2027-04-05T11:00:00Z"
+          },
+          "status": {
+            "type": "string",
+            "description": "当前状态",
+            "example": "active"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间",
+            "format": "date-time",
+            "example": "2026-04-05T11:00:00Z"
+          }
+        },
+        "description": "历史材料详情响应"
+      },
+      "ApiResponseVoid": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "稳定业务码。成功固定为 SUCCESS / CREATED，失败为 MEM-* 业务错误码",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应说明，供人阅读；调用方应优先根据 code 分支，而不是依赖 message 文案",
+            "example": "success"
+          },
+          "data": {
+            "type": "object",
+            "description": "响应数据。失败时通常为 null"
+          },
+          "httpStatus": {
+            "type": "integer",
+            "description": "HTTP 状态语义的镜像字段，便于日志和接入层统一处理",
+            "format": "int32",
+            "example": 200
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "服务端响应时间戳（Epoch 毫秒）",
+            "format": "int64",
+            "example": 1775326400123
+          }
+        },
+        "description": "统一响应包装"
+      },
+      "LoginRequest": {
+        "required": [
+          "password",
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "管理员用户名",
+            "example": "admin"
+          },
+          "password": {
+            "type": "string",
+            "description": "管理员密码",
+            "example": "change-me"
+          }
+        },
+        "description": "管理员登录请求"
+      },
+      "ApiResponseAuthMeResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "稳定业务码。成功固定为 SUCCESS / CREATED，失败为 MEM-* 业务错误码",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应说明，供人阅读；调用方应优先根据 code 分支，而不是依赖 message 文案",
+            "example": "success"
+          },
+          "data": {
+            "$ref": "#/components/schemas/AuthMeResponse"
+          },
+          "httpStatus": {
+            "type": "integer",
+            "description": "HTTP 状态语义的镜像字段，便于日志和接入层统一处理",
+            "format": "int32",
+            "example": 200
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "服务端响应时间戳（Epoch 毫秒）",
+            "format": "int64",
+            "example": 1775326400123
+          }
+        },
+        "description": "统一响应包装"
+      },
+      "AuthMeResponse": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "description": "系统内部用户 ID",
+            "example": "u_4a6f0a0cf7ae4e6584efeb17cbb3e0ef"
+          },
+          "username": {
+            "type": "string",
+            "description": "管理员登录名",
+            "example": "admin"
+          },
+          "role": {
+            "type": "string",
+            "description": "当前角色。单用户阶段固定为 admin",
+            "example": "admin"
+          }
+        },
+        "description": "当前管理员信息"
+      },
+      "CreateApiTokenRequest": {
+        "required": [
+          "accessLevel",
+          "clientType",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Token 名称",
+            "example": "我的 CLI Token"
+          },
+          "clientType": {
+            "type": "string",
+            "description": "Token 客户端类型",
+            "example": "cli",
+            "enum": [
+              "CLI",
+              "MCP",
+              "AUTOMATION",
+              "WEB_LEGACY"
+            ]
+          },
+          "accessLevel": {
+            "type": "string",
+            "description": "Token 访问级别",
+            "example": "read_write",
+            "enum": [
+              "READ_ONLY",
+              "READ_WRITE"
+            ]
+          },
+          "expiresInDays": {
+            "minimum": 0,
+            "type": "integer",
+            "description": "过期天数。不传则使用默认值；传 0 表示永不过期",
+            "format": "int32",
+            "example": 365
+          }
+        },
+        "description": "创建 API Token 请求"
+      },
+      "ApiResponseCreatedApiTokenResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "稳定业务码。成功固定为 SUCCESS / CREATED，失败为 MEM-* 业务错误码",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应说明，供人阅读；调用方应优先根据 code 分支，而不是依赖 message 文案",
+            "example": "success"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CreatedApiTokenResponse"
+          },
+          "httpStatus": {
+            "type": "integer",
+            "description": "HTTP 状态语义的镜像字段，便于日志和接入层统一处理",
+            "format": "int32",
+            "example": 200
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "服务端响应时间戳（Epoch 毫秒）",
+            "format": "int64",
+            "example": 1775326400123
+          }
+        },
+        "description": "统一响应包装"
+      },
+      "ApiTokenSummaryResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Token ID",
+            "example": "tok_01HSZQ6T6XW7A8B9C0D1E2F3G4"
+          },
+          "name": {
+            "type": "string",
+            "description": "Token 名称",
+            "example": "本地 CLI"
+          },
+          "tokenPrefix": {
+            "type": "string",
+            "description": "Token 前缀，只用于展示和人工核对，不是完整 token",
+            "example": "mk-Qwerty12****"
+          },
+          "clientType": {
+            "type": "string",
+            "description": "客户端类型",
+            "example": "cli"
+          },
+          "accessLevel": {
+            "type": "string",
+            "description": "访问级别。read_only 只能读，read_write 可读写",
+            "example": "read_write"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "是否有效",
+            "example": true
+          },
+          "expiresAt": {
+            "type": "string",
+            "description": "过期时间。null 表示永不过期",
+            "format": "date-time"
+          },
+          "lastUsedAt": {
+            "type": "string",
+            "description": "最后使用时间。首次创建后未被调用时可能为 null",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间",
+            "format": "date-time"
+          }
+        },
+        "description": "API Token 概览"
+      },
+      "CreatedApiTokenResponse": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "一次性返回的完整明文 token。创建成功后请立即保存，后续接口不会再回显。",
+            "example": "mk-u0S2dY4f8A1nQx7Vw3KpLm9Jr5HtCz"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/ApiTokenSummaryResponse"
+          }
+        },
+        "description": "创建 API Token 响应。token 明文只返回一次。"
+      },
+      "CreateLlmProviderRequest": {
+        "required": [
+          "baseUrl",
+          "model",
+          "name",
+          "providerType"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "providerType": {
+            "type": "string"
+          },
+          "baseUrl": {
+            "type": "string",
+            "description": "OpenAI 兼容 chat/completions 接口地址",
+            "example": "https://api.openai.com/v1/chat/completions"
+          },
+          "model": {
+            "type": "string"
+          },
+          "apiKey": {
+            "type": "string",
+            "description": "明文 API key。允许为空，适用于本地代理或上游网关统一补鉴权的场景"
+          },
+          "activate": {
+            "type": "boolean",
+            "description": "新增后是否立即切换为当前激活项",
+            "default": false
+          }
+        },
+        "description": "新增 LLM Provider 请求"
+      },
+      "TestLlmProviderRequest": {
+        "type": "object",
+        "properties": {
+          "providerId": {
+            "type": "string",
+            "description": "已保存的 provider ID"
+          },
+          "providerType": {
+            "type": "string",
+            "description": "provider 类型",
+            "example": "openai_compatible"
+          },
+          "baseUrl": {
+            "type": "string",
+            "description": "baseUrl",
+            "example": "https://api.openai.com/v1/chat/completions"
+          },
+          "model": {
+            "type": "string",
+            "description": "模型名",
+            "example": "gpt-4.1-mini"
+          },
+          "apiKey": {
+            "type": "string",
+            "description": "测试时使用的明文 API key。为空表示请求本身不附带 Authorization 头"
+          }
+        },
+        "description": "测试 LLM Provider 请求"
+      },
+      "ApiResponseLlmProviderTestResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "稳定业务码。成功固定为 SUCCESS / CREATED，失败为 MEM-* 业务错误码",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应说明，供人阅读；调用方应优先根据 code 分支，而不是依赖 message 文案",
+            "example": "success"
+          },
+          "data": {
+            "$ref": "#/components/schemas/LlmProviderTestResponse"
+          },
+          "httpStatus": {
+            "type": "integer",
+            "description": "HTTP 状态语义的镜像字段，便于日志和接入层统一处理",
+            "format": "int32",
+            "example": 200
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "服务端响应时间戳（Epoch 毫秒）",
+            "format": "int64",
+            "example": 1775326400123
+          }
+        },
+        "description": "统一响应包装"
+      },
+      "LlmProviderTestResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "是否测试成功"
+          },
+          "message": {
+            "type": "string",
+            "description": "测试说明"
+          }
+        },
+        "description": "LLM Provider 测试结果"
+      },
+      "CreateEmbeddingProviderRequest": {
+        "required": [
+          "baseUrl",
+          "model",
+          "name",
+          "providerType"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "配置名称",
+            "example": "OpenAI 生产"
+          },
+          "providerType": {
+            "type": "string",
+            "description": "provider 类型",
+            "example": "openai_compatible"
+          },
+          "baseUrl": {
+            "type": "string",
+            "description": "OpenAI 兼容 embedding 接口地址",
+            "example": "https://api.openai.com/v1/embeddings"
+          },
+          "model": {
+            "type": "string",
+            "description": "embedding 模型名",
+            "example": "text-embedding-3-small"
+          },
+          "dimensions": {
+            "maximum": 8192,
+            "minimum": 1,
+            "type": "integer",
+            "description": "向量维度",
+            "format": "int32",
+            "example": 1536
+          },
+          "apiKey": {
+            "type": "string",
+            "description": "明文 API key。允许为空，适用于本地无鉴权代理或由上游网关统一补鉴权的场景；服务端不会回显",
+            "example": "sk-xxxxx"
+          },
+          "activate": {
+            "type": "boolean",
+            "description": "新增后是否立即切换为当前激活项",
+            "default": false
+          }
+        },
+        "description": "新增 Embedding Provider 请求"
+      },
+      "TestEmbeddingProviderRequest": {
+        "type": "object",
+        "properties": {
+          "providerId": {
+            "type": "string",
+            "description": "已保存的 provider ID",
+            "example": "epc_xxxxx"
+          },
+          "providerType": {
+            "type": "string",
+            "description": "provider 类型",
+            "example": "openai_compatible"
+          },
+          "baseUrl": {
+            "type": "string",
+            "description": "baseUrl",
+            "example": "https://api.openai.com/v1/embeddings"
+          },
+          "model": {
+            "type": "string",
+            "description": "模型名",
+            "example": "text-embedding-3-small"
+          },
+          "dimensions": {
+            "type": "integer",
+            "description": "向量维度",
+            "format": "int32",
+            "example": 1536
+          },
+          "apiKey": {
+            "type": "string",
+            "description": "测试时使用的明文 API key。为空表示请求本身不附带 Authorization 头",
+            "example": "sk-xxxxx"
+          }
+        },
+        "description": "测试 Embedding Provider 请求"
+      },
+      "ApiResponseEmbeddingProviderTestResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "稳定业务码。成功固定为 SUCCESS / CREATED，失败为 MEM-* 业务错误码",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应说明，供人阅读；调用方应优先根据 code 分支，而不是依赖 message 文案",
+            "example": "success"
+          },
+          "data": {
+            "$ref": "#/components/schemas/EmbeddingProviderTestResponse"
+          },
+          "httpStatus": {
+            "type": "integer",
+            "description": "HTTP 状态语义的镜像字段，便于日志和接入层统一处理",
+            "format": "int32",
+            "example": 200
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "服务端响应时间戳（Epoch 毫秒）",
+            "format": "int64",
+            "example": 1775326400123
+          }
+        },
+        "description": "统一响应包装"
+      },
+      "EmbeddingProviderTestResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "是否测试成功"
+          },
+          "message": {
+            "type": "string",
+            "description": "测试说明"
+          },
+          "dimensions": {
+            "type": "integer",
+            "description": "测试返回的向量维度",
+            "format": "int32"
+          }
+        },
+        "description": "Embedding Provider 测试结果"
+      },
+      "ChangeMemoryStatusRequest": {
+        "required": [
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "目标状态",
+            "example": "archived",
+            "enum": [
+              "active",
+              "archived",
+              "invalid",
+              "deleted"
+            ]
+          }
+        },
+        "description": "记忆状态变更请求"
+      },
+      "ApiResponseListMemorySummaryResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "稳定业务码。成功固定为 SUCCESS / CREATED，失败为 MEM-* 业务错误码",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应说明，供人阅读；调用方应优先根据 code 分支，而不是依赖 message 文案",
+            "example": "success"
+          },
+          "data": {
+            "type": "array",
+            "description": "响应数据。失败时通常为 null",
+            "items": {
+              "$ref": "#/components/schemas/MemorySummaryResponse"
+            }
+          },
+          "httpStatus": {
+            "type": "integer",
+            "description": "HTTP 状态语义的镜像字段，便于日志和接入层统一处理",
+            "format": "int32",
+            "example": 200
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "服务端响应时间戳（Epoch 毫秒）",
+            "format": "int64",
+            "example": 1775326400123
+          }
+        },
+        "description": "统一响应包装"
+      },
+      "ApiResponseListHistoryRecordSummaryResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "稳定业务码。成功固定为 SUCCESS / CREATED，失败为 MEM-* 业务错误码",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应说明，供人阅读；调用方应优先根据 code 分支，而不是依赖 message 文案",
+            "example": "success"
+          },
+          "data": {
+            "type": "array",
+            "description": "响应数据。失败时通常为 null",
+            "items": {
+              "$ref": "#/components/schemas/HistoryRecordSummaryResponse"
+            }
+          },
+          "httpStatus": {
+            "type": "integer",
+            "description": "HTTP 状态语义的镜像字段，便于日志和接入层统一处理",
+            "format": "int32",
+            "example": 200
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "服务端响应时间戳（Epoch 毫秒）",
+            "format": "int64",
+            "example": 1775326400123
+          }
+        },
+        "description": "统一响应包装"
+      },
+      "ApiResponseDashboardOverviewResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "稳定业务码。成功固定为 SUCCESS / CREATED，失败为 MEM-* 业务错误码",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应说明，供人阅读；调用方应优先根据 code 分支，而不是依赖 message 文案",
+            "example": "success"
+          },
+          "data": {
+            "$ref": "#/components/schemas/DashboardOverviewResponse"
+          },
+          "httpStatus": {
+            "type": "integer",
+            "description": "HTTP 状态语义的镜像字段，便于日志和接入层统一处理",
+            "format": "int32",
+            "example": 200
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "服务端响应时间戳（Epoch 毫秒）",
+            "format": "int64",
+            "example": 1775326400123
+          }
+        },
+        "description": "统一响应包装"
+      },
+      "DailyWritePointResponse": {
+        "type": "object",
+        "properties": {
+          "day": {
+            "type": "string",
+            "description": "日期，格式 yyyy-MM-dd",
+            "example": "2026-04-05"
+          },
+          "memoryWrites": {
+            "type": "integer",
+            "description": "稳定记忆写入数",
+            "format": "int64",
+            "example": 3
+          },
+          "historyWrites": {
+            "type": "integer",
+            "description": "历史材料写入数",
+            "format": "int64",
+            "example": 2
+          },
+          "totalWrites": {
+            "type": "integer",
+            "description": "总写入数",
+            "format": "int64",
+            "example": 5
+          }
+        },
+        "description": "按天聚合的写入趋势点"
+      },
+      "DashboardOverviewResponse": {
+        "type": "object",
+        "properties": {
+          "memoryCount": {
+            "type": "integer",
+            "description": "稳定记忆总数",
+            "format": "int64",
+            "example": 42
+          },
+          "conflictMemoryCount": {
+            "type": "integer",
+            "description": "冲突候选记忆数",
+            "format": "int64",
+            "example": 4
+          },
+          "historyRecordCount": {
+            "type": "integer",
+            "description": "历史材料总数",
+            "format": "int64",
+            "example": 18
+          },
+          "currentMode": {
+            "type": "string",
+            "description": "当前记忆模式",
+            "example": "manual"
+          },
+          "recentMemories": {
+            "type": "array",
+            "description": "最近稳定记忆摘要",
+            "items": {
+              "$ref": "#/components/schemas/MemorySummaryResponse"
+            }
+          },
+          "recentHistories": {
+            "type": "array",
+            "description": "最近历史材料摘要",
+            "items": {
+              "$ref": "#/components/schemas/HistoryRecordSummaryResponse"
+            }
+          },
+          "writesLast7Days": {
+            "type": "array",
+            "description": "最近 7 天写入趋势",
+            "items": {
+              "$ref": "#/components/schemas/DailyWritePointResponse"
+            }
+          }
+        },
+        "description": "仪表盘概览响应"
+      },
+      "ApiResponseListApiTokenSummaryResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "稳定业务码。成功固定为 SUCCESS / CREATED，失败为 MEM-* 业务错误码",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应说明，供人阅读；调用方应优先根据 code 分支，而不是依赖 message 文案",
+            "example": "success"
+          },
+          "data": {
+            "type": "array",
+            "description": "响应数据。失败时通常为 null",
+            "items": {
+              "$ref": "#/components/schemas/ApiTokenSummaryResponse"
+            }
+          },
+          "httpStatus": {
+            "type": "integer",
+            "description": "HTTP 状态语义的镜像字段，便于日志和接入层统一处理",
+            "format": "int32",
+            "example": 200
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "服务端响应时间戳（Epoch 毫秒）",
+            "format": "int64",
+            "example": 1775326400123
+          }
+        },
+        "description": "统一响应包装"
+      },
+      "ApiResponseListAuditEventResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "稳定业务码。成功固定为 SUCCESS / CREATED，失败为 MEM-* 业务错误码",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应说明，供人阅读；调用方应优先根据 code 分支，而不是依赖 message 文案",
+            "example": "success"
+          },
+          "data": {
+            "type": "array",
+            "description": "响应数据。失败时通常为 null",
+            "items": {
+              "$ref": "#/components/schemas/AuditEventResponse"
+            }
+          },
+          "httpStatus": {
+            "type": "integer",
+            "description": "HTTP 状态语义的镜像字段，便于日志和接入层统一处理",
+            "format": "int32",
+            "example": 200
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "服务端响应时间戳（Epoch 毫秒）",
+            "format": "int64",
+            "example": 1775326400123
+          }
+        },
+        "description": "统一响应包装"
+      },
+      "AuditEventResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "审计事件 ID",
+            "example": "aud_01HSZRA2Q4W6E8R0T1Y2U3I4O5"
+          },
+          "userId": {
+            "type": "string",
+            "description": "所属用户 ID",
+            "example": "u_4a6f0a0cf7ae4e6584efeb17cbb3e0ef"
+          },
+          "actorType": {
+            "type": "string",
+            "description": "行为主体类型。第一版主要有 web_session 和 api_token",
+            "example": "api_token"
+          },
+          "tokenId": {
+            "type": "string",
+            "description": "触发事件的 token ID。只有 api_token 事件才会有值",
+            "example": "tok_01HSZQ6T6XW7A8B9C0D1E2F3G4"
+          },
+          "sessionId": {
+            "type": "string",
+            "description": "触发事件的 session ID。只有管理员 Session 事件才会有值"
+          },
+          "action": {
+            "type": "string",
+            "description": "动作类型",
+            "example": "memory.create"
+          },
+          "targetType": {
+            "type": "string",
+            "description": "目标对象类型",
+            "example": "memory"
+          },
+          "targetId": {
+            "type": "string",
+            "description": "目标对象 ID",
+            "example": "mem_01HSZRB7E6W5Q4T3Y2U1I0O9P8"
+          },
+          "summary": {
+            "type": "string",
+            "description": "给人看的简短说明",
+            "example": "写入稳定记忆: 接口约定"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "事件时间",
+            "format": "date-time"
+          }
+        },
+        "description": "审计事件响应"
+      },
+      "ApiResponseListLlmProviderResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "稳定业务码。成功固定为 SUCCESS / CREATED，失败为 MEM-* 业务错误码",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应说明，供人阅读；调用方应优先根据 code 分支，而不是依赖 message 文案",
+            "example": "success"
+          },
+          "data": {
+            "type": "array",
+            "description": "响应数据。失败时通常为 null",
+            "items": {
+              "$ref": "#/components/schemas/LlmProviderResponse"
+            }
+          },
+          "httpStatus": {
+            "type": "integer",
+            "description": "HTTP 状态语义的镜像字段，便于日志和接入层统一处理",
+            "format": "int32",
+            "example": 200
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "服务端响应时间戳（Epoch 毫秒）",
+            "format": "int64",
+            "example": 1775326400123
+          }
+        },
+        "description": "统一响应包装"
+      },
+      "ApiResponseEffectiveLlmProviderResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "稳定业务码。成功固定为 SUCCESS / CREATED，失败为 MEM-* 业务错误码",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应说明，供人阅读；调用方应优先根据 code 分支，而不是依赖 message 文案",
+            "example": "success"
+          },
+          "data": {
+            "$ref": "#/components/schemas/EffectiveLlmProviderResponse"
+          },
+          "httpStatus": {
+            "type": "integer",
+            "description": "HTTP 状态语义的镜像字段，便于日志和接入层统一处理",
+            "format": "int32",
+            "example": 200
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "服务端响应时间戳（Epoch 毫秒）",
+            "format": "int64",
+            "example": 1775326400123
+          }
+        },
+        "description": "统一响应包装"
+      },
+      "EffectiveLlmProviderResponse": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string",
+            "description": "当前配置来源：console | environment | rule_only"
+          },
+          "llmEnabled": {
+            "type": "boolean",
+            "description": "当前是否启用 LLM Judge"
+          },
+          "judgeMode": {
+            "type": "string",
+            "description": "当前 Judge 模式：llm_with_rule_fallback | rule_only"
+          },
+          "name": {
+            "type": "string",
+            "description": "当前 provider 名称。纯规则模式下为空"
+          },
+          "providerType": {
+            "type": "string",
+            "description": "provider 类型。纯规则模式下为空"
+          },
+          "model": {
+            "type": "string",
+            "description": "模型名。纯规则模式下为空"
+          }
+        },
+        "description": "当前生效的 LLM Judge 配置状态"
+      },
+      "ApiResponseListJudgeRuleResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "稳定业务码。成功固定为 SUCCESS / CREATED，失败为 MEM-* 业务错误码",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应说明，供人阅读；调用方应优先根据 code 分支，而不是依赖 message 文案",
+            "example": "success"
+          },
+          "data": {
+            "type": "array",
+            "description": "响应数据。失败时通常为 null",
+            "items": {
+              "$ref": "#/components/schemas/JudgeRuleResponse"
+            }
+          },
+          "httpStatus": {
+            "type": "integer",
+            "description": "HTTP 状态语义的镜像字段，便于日志和接入层统一处理",
+            "format": "int32",
+            "example": 200
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "服务端响应时间戳（Epoch 毫秒）",
+            "format": "int64",
+            "example": 1775326400123
+          }
+        },
+        "description": "统一响应包装"
+      },
+      "ApiResponseListEmbeddingProviderResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "稳定业务码。成功固定为 SUCCESS / CREATED，失败为 MEM-* 业务错误码",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应说明，供人阅读；调用方应优先根据 code 分支，而不是依赖 message 文案",
+            "example": "success"
+          },
+          "data": {
+            "type": "array",
+            "description": "响应数据。失败时通常为 null",
+            "items": {
+              "$ref": "#/components/schemas/EmbeddingProviderResponse"
+            }
+          },
+          "httpStatus": {
+            "type": "integer",
+            "description": "HTTP 状态语义的镜像字段，便于日志和接入层统一处理",
+            "format": "int32",
+            "example": 200
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "服务端响应时间戳（Epoch 毫秒）",
+            "format": "int64",
+            "example": 1775326400123
+          }
+        },
+        "description": "统一响应包装"
+      },
+      "ApiResponseEffectiveEmbeddingProviderResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "稳定业务码。成功固定为 SUCCESS / CREATED，失败为 MEM-* 业务错误码",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应说明，供人阅读；调用方应优先根据 code 分支，而不是依赖 message 文案",
+            "example": "success"
+          },
+          "data": {
+            "$ref": "#/components/schemas/EffectiveEmbeddingProviderResponse"
+          },
+          "httpStatus": {
+            "type": "integer",
+            "description": "HTTP 状态语义的镜像字段，便于日志和接入层统一处理",
+            "format": "int32",
+            "example": 200
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "服务端响应时间戳（Epoch 毫秒）",
+            "format": "int64",
+            "example": 1775326400123
+          }
+        },
+        "description": "统一响应包装"
+      },
+      "EffectiveEmbeddingProviderResponse": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string",
+            "description": "当前配置来源：console | environment | lexical_only"
+          },
+          "vectorEnabled": {
+            "type": "boolean",
+            "description": "当前是否启用向量检索"
+          },
+          "searchMode": {
+            "type": "string",
+            "description": "当前搜索模式：hybrid | lexical_only"
+          },
+          "name": {
+            "type": "string",
+            "description": "当前 provider 名称。纯词法模式下为空"
+          },
+          "providerType": {
+            "type": "string",
+            "description": "provider 类型。纯词法模式下为空"
+          },
+          "model": {
+            "type": "string",
+            "description": "模型名。纯词法模式下为空"
+          },
+          "dimensions": {
+            "type": "integer",
+            "description": "向量维度。纯词法模式下为空",
+            "format": "int32"
+          }
+        },
+        "description": "当前生效的 Embedding Provider 状态"
+      },
+      "AuditEventQuery": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "description": "动作过滤",
+            "example": "memory.create"
+          },
+          "actorType": {
+            "type": "string",
+            "description": "主体类型过滤。可选 web_session / api_token",
+            "example": "api_token"
+          },
+          "tokenId": {
+            "type": "string",
+            "description": "Token ID 过滤",
+            "example": "tok_01HSZQ6T6XW7A8B9C0D1E2F3G4"
+          },
+          "targetType": {
+            "type": "string",
+            "description": "目标对象类型过滤",
+            "example": "memory"
+          },
+          "from": {
+            "type": "string",
+            "description": "起始时间（含）",
+            "format": "date-time",
+            "example": "2026-04-01T00:00:00Z"
+          },
+          "to": {
+            "type": "string",
+            "description": "结束时间（含）",
+            "format": "date-time",
+            "example": "2026-04-05T23:59:59Z"
+          },
+          "page": {
+            "type": "integer",
+            "description": "页码，从 1 开始",
+            "format": "int32",
+            "example": 1
+          },
+          "size": {
+            "type": "integer",
+            "description": "每页条数",
+            "format": "int32",
+            "example": 50
+          }
+        },
+        "description": "审计事件查询参数"
+      }
+    },
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "description": "API Token 认证，格式：Bearer {token}。适用于 CLI / MCP / 自动化调用。",
+        "scheme": "bearer",
+        "bearerFormat": "Token"
+      },
+      "AdminSession": {
+        "type": "apiKey",
+        "description": "管理员浏览器登录态。通过 /v1/auth/login 登录成功后，由服务端写入 HttpOnly Session Cookie。",
+        "name": "JSESSIONID",
+        "in": "cookie"
+      }
+    }
+  }
+}

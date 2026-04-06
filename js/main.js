@@ -44,6 +44,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     });
+
+    // Update doc links based on language
+    // zh-CN and zh-TW use the default (Chinese) docs path
+    // EN / JA / KO use the /docs/en/ path
+    const isZh = (lang === 'zh-CN' || lang === 'zh-TW');
+    const docsBase  = isZh ? '/docs/' : '/docs/en/';
+    const docsPath  = (slug) => isZh ? `/docs/docs/${slug}` : `/docs/en/docs/${slug}`;
+
+    // Nav & Hero CTA links
+    document.querySelectorAll('a[data-i18n="nav_docs"], a[data-i18n="btn_docs"]').forEach(a => {
+      a.href = docsBase;
+    });
+
+    // Footer concept links — keep slugs, swap language prefix
+    document.querySelectorAll('.fl-group a[href*="/docs/"]').forEach(a => {
+      const match = a.href.match(/\/docs(?:\/en)?\/?docs\/(.+)$/);
+      if (match) {
+        a.href = docsPath(match[1]);
+      }
+    });
   }
 
   // 2. Theme Support
