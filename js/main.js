@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 1. Language Support
   const langSwitch = document.getElementById('langSwitch');
   const userLang = navigator.language || navigator.userLanguage;
-  let currentLang = 'en';
+  let currentLang = 'zh-CN';
 
   if (userLang.startsWith('zh-TW') || userLang.startsWith('zh-HK')) currentLang = 'zh-TW';
   else if (userLang.startsWith('zh')) currentLang = 'zh-CN';
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 2. Theme Support
   const themeToggle = document.getElementById('themeToggle');
-  const currentTheme = localStorage.getItem('yuyi_theme') || 'dark';
+  const currentTheme = localStorage.getItem('yuyi_theme') || 'light';
   document.documentElement.setAttribute('data-theme', currentTheme);
 
   if (themeToggle) {
