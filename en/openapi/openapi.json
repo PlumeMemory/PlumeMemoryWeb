@@ -4,8 +4,8 @@
     "title": "羽忆 Memory Server API",
     "description": "统一云记忆基础设施 REST API —— 为多 Agent 提供统一长期记忆服务。\n\n文档说明：\n- 记忆读写接口默认支持 `Authorization: Bearer {token}` 或管理员 Session Cookie\n- `/v1/admin/**` 和 `/v1/auth/me`、`/v1/auth/logout` 仅允许管理员 Session 访问\n- `/v1/auth/login` 用用户名密码登录，成功后服务端会写入 `JSESSIONID` HttpOnly Cookie\n- 所有接口统一返回 `{code, message, data, httpStatus, timestamp}` 结构\n- `code` 是稳定业务码，成功固定为 `SUCCESS / CREATED`，失败为 `MEM-*`\n- 列表、搜索、最近记忆接口返回摘要模型；详情接口返回完整对象\n- `scope.userId` 由服务端按当前登录用户校验，不能借请求体伪造其他用户\n",
     "contact": {
-      "name": "zyaire",
-      "url": "https://github.com/zyaire"
+      "name": "PlumeMemory",
+      "url": "https://github.com/PlumeMemory"
     },
     "version": "v1.0.0"
   },
@@ -713,19 +713,6 @@
           "required": true
         },
         "responses": {
-          "403": {
-            "description": "当前用户无权写入该 scope，或处于 temporary 模式",
-            "content": {
-              "*/*": {
-                "example": {
-                  "code": "MEM-MEM006",
-                  "message": "临时模式已开启，写入被阻止",
-                  "httpStatus": 403,
-                  "timestamp": 1775326400123
-                }
-              }
-            }
-          },
           "400": {
             "description": "请求参数不合法，或被 Judge 拒绝",
             "content": {
@@ -734,6 +721,19 @@
                   "code": "MEM-SYS003",
                   "message": "参数校验失败：memoryType 不能为空",
                   "httpStatus": 400,
+                  "timestamp": 1775326400123
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "当前用户无权写入该 scope，或处于 temporary 模式",
+            "content": {
+              "*/*": {
+                "example": {
+                  "code": "MEM-MEM006",
+                  "message": "临时模式已开启，写入被阻止",
+                  "httpStatus": 403,
                   "timestamp": 1775326400123
                 }
               }
@@ -1120,6 +1120,16 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": "登录成功，返回管理员信息并写入 Session Cookie",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAuthMeResponse"
+                }
+              }
+            }
+          },
           "401": {
             "description": "用户名或密码错误",
             "content": {
@@ -1129,16 +1139,6 @@
                   "message": "用户名或密码错误",
                   "httpStatus": 401,
                   "timestamp": 1775326400123
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "登录成功，返回管理员信息并写入 Session Cookie",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseAuthMeResponse"
                 }
               }
             }
