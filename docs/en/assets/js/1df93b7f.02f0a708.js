@@ -1,1 +1,0 @@
-"use strict";(globalThis.webpackChunkmemory_docs=globalThis.webpackChunkmemory_docs||[]).push([[4583],{36866(o,s,r){r.r(s),r.d(s,{default:()=>e});var c=r(56347),d=r(74848);function e(){return(0,d.jsx)(c.rd,{to:"/docs/docs/intro"})}}}]);

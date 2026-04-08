@@ -1,692 +1,75 @@
-<!DOCTYPE html>
-<html lang="zh-CN" data-theme="light">
-
+<!doctype html>
+<html lang="zh-CN" dir="ltr" class="plugin-pages plugin-id-default" data-has-hydrated="false">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>YuYi — Unified Cloud Memory Infrastructure</title>
-  <meta name="description"
-    content="YuYi is a self-hosted, model-agnostic cloud memory layer for AI agents. One memory layer shared across every tool you use." />
-  <meta property="og:title" content="YuYi — Unified Cloud Memory Infrastructure" />
-  <meta property="og:description" content="Self-hosted long-term memory for AI agents. Model-agnostic. Open source." />
-  <link rel="icon" type="image/png" href="img/羽忆-small.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap"
-    rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css" />
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">Unified Cloud Memory Infrastructure | 羽忆 · PlumeMemory</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://memory.zyaire.top/img/docusaurus-social-card.jpg"><meta data-rh="true" name="twitter:image" content="https://memory.zyaire.top/img/docusaurus-social-card.jpg"><meta data-rh="true" property="og:url" content="https://memory.zyaire.top/"><meta data-rh="true" property="og:locale" content="zh_CN"><meta data-rh="true" property="og:locale:alternate" content="en"><meta data-rh="true" name="docusaurus_locale" content="zh-CN"><meta data-rh="true" name="docusaurus_tag" content="default"><meta data-rh="true" name="docsearch:language" content="zh-CN"><meta data-rh="true" name="docsearch:docusaurus_tag" content="default"><meta data-rh="true" property="og:title" content="Unified Cloud Memory Infrastructure | 羽忆 · PlumeMemory"><meta data-rh="true" name="description" content="Self-hosted, model-agnostic cloud memory infrastructure for multi-agent systems."><meta data-rh="true" property="og:description" content="Self-hosted, model-agnostic cloud memory infrastructure for multi-agent systems."><link data-rh="true" rel="icon" href="/img/favicon.png"><link data-rh="true" rel="canonical" href="https://memory.zyaire.top/"><link data-rh="true" rel="alternate" href="https://memory.zyaire.top/" hreflang="zh-CN"><link data-rh="true" rel="alternate" href="https://memory.zyaire.top/en/" hreflang="en"><link data-rh="true" rel="alternate" href="https://memory.zyaire.top/" hreflang="x-default"><script data-rh="true">function insertBanner(){var n=document.createElement("div");n.id="__docusaurus-base-url-issue-banner-container";n.innerHTML='\n<div id="__docusaurus-base-url-issue-banner" style="border: thick solid red; background-color: rgb(255, 230, 179); margin: 20px; padding: 20px; font-size: 20px;">\n   <p style="font-weight: bold; font-size: 30px;">Your Docusaurus site did not load properly.</p>\n   <p>A very common reason is a wrong site <a href="https://docusaurus.io/docs/docusaurus.config.js/#baseUrl" style="font-weight: bold;">baseUrl configuration</a>.</p>\n   <p>Current configured baseUrl = <span style="font-weight: bold; color: red;">/</span>  (default value)</p>\n   <p>We suggest trying baseUrl = <span id="__docusaurus-base-url-issue-banner-suggestion-container" style="font-weight: bold; color: green;"></span></p>\n</div>\n',document.body.prepend(n);var e=document.getElementById("__docusaurus-base-url-issue-banner-suggestion-container"),s=window.location.pathname,o="/"===s.substr(-1)?s:s+"/";e.innerHTML=o}document.addEventListener("DOMContentLoaded",function(){void 0===window.docusaurus&&insertBanner()})</script><link rel="stylesheet" href="/assets/css/styles.aea5fe4a.css">
+<script src="/assets/js/runtime~main.6ea29565.js" defer="defer"></script>
+<script src="/assets/js/main.5fb6052f.js" defer="defer"></script>
 </head>
-
-<body>
-
-  <!-- ─── NAV ─────────────────────────────────────────────── -->
-  <nav id="nav">
-    <div class="nav-inner">
-      <a href="#" class="nav-logo">
-        <img src="img/羽忆-origin.png" alt="PlumeMemory Logo" class="logo-img" />
-        <span class="logo-text" data-i18n="logo_name">羽忆</span>
-      </a>
-      <div class="nav-menu-wrapper">
-        <ul class="nav-links">
-          <li><a href="#architecture" data-i18n="nav_arch">Architecture</a></li>
-          <li><a href="#features" data-i18n="nav_feat">Features</a></li>
-          <li><a href="#api" data-i18n="nav_api">API</a></li>
-          <li><a href="#deploy" data-i18n="nav_deploy">Deploy</a></li>
-          <li><a href="/docs/" data-i18n="nav_docs">Docs</a></li>
-        </ul>
-        <div class="nav-actions">
-          <div class="controls">
-            <select id="langSwitch" class="ctrl-select" aria-label="Switch Language">
-              <option value="en">EN</option>
-              <option value="zh-CN">简体中文</option>
-              <option value="zh-TW">繁體中文</option>
-              <option value="ja">日本語</option>
-              <option value="ko">한국어</option>
-            </select>
-            <button id="themeToggle" class="ctrl-btn" aria-label="Toggle Theme">
-              <svg class="sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2">
-                <circle cx="12" cy="12" r="5" />
-                <line x1="12" y1="1" x2="12" y2="3" />
-                <line x1="12" y1="21" x2="12" y2="23" />
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-                <line x1="1" y1="12" x2="3" y2="12" />
-                <line x1="21" y1="12" x2="23" y2="12" />
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-              </svg>
-              <svg class="moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-              </svg>
-            </button>
-          </div>
-          <a href="https://github.com/plumememory/yuyi" class="btn-ghost" target="_blank">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path
-                d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-            </svg>
-            <span class="gh-text">GitHub</span>
-          </a>
-          <a href="#deploy" class="btn-primary" data-i18n="btn_started">Get Started</a>
-        </div>
-      </div>
-      <button class="nav-toggle" id="navToggle" aria-label="Menu">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
-  </nav>
-
-  <!-- ─── HERO ─────────────────────────────────────────────── -->
-  <section id="hero">
-    <div class="hero-inner">
-      <div class="hero-content">
-        <div class="hero-badge" data-i18n="hero_badge">Open Source · Self-Hosted · v0.1 MVP</div>
-        <h1 class="hero-headline">
-          <span data-i18n="hero_head1">Shared Memory.</span><br />
-          <em data-i18n="hero_head2">Unified Soul.</em>
-        </h1>
-        <p class="hero-sub" data-i18n="hero_sub">
-          YuYi gives every AI agent you use a shared, persistent memory layer —
-          deployed on your own infrastructure, owned by you, readable by all.
-        </p>
-        <div class="hero-cta">
-          <a href="#deploy" class="btn-primary btn-lg" data-i18n="btn_quick">Quick Deploy</a>
-          <a href="/docs/" class="btn-ghost btn-lg" data-i18n="btn_docs">Read Docs</a>
-        </div>
-        <div class="hero-meta">
-          <span>Java 21 + Spring Boot</span>
-          <span class="sep">·</span>
-          <span>PostgreSQL + pgvector</span>
-          <span class="sep">·</span>
-          <span>MCP / CLI / REST</span>
-        </div>
-      </div>
-      <div class="hero-terminal">
-        <div class="terminal-bar">
-          <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
-          <span class="terminal-title">memory-server</span>
-        </div>
-        <pre class="terminal-body"><code><span class="c"># Write a memory from any agent</span>
-<span class="cmd">$</span> curl -X POST https://memory.local/v1/memories \
-    -H "Authorization: Bearer mk-..." \
-    -d '{
-  "content": "All API responses follow {code, message, data}",
-  "memoryType": "project_rule",
-  "scope": { "projectId": "p_demo" }
-}'
-
-<span class="out">{
-  "code": "CREATED",
-  "data": {
-    "id": "<span class="acc">mem_a1b2c3d4</span>",
-    "memoryType": "project_rule",
-    "importance": 0.9,
-    "status": "active"
-  }
-}</span>
-
-<span class="c"># Recall context for a task — from any other agent</span>
-<span class="cmd">$</span> curl -X POST https://memory.local/v1/recall \
-    -d '{ "task": "Implement user registration", "maxTokens": 2000 }'</code></pre>
-      </div>
-    </div>
-    <div class="hero-fade"></div>
-  </section>
-
-  <!-- ─── PROBLEM ──────────────────────────────────────────── -->
-  <section id="problem" class="section">
-    <div class="container">
-      <div class="section-label" data-i18n="prob_label">The Problem</div>
-      <h2 class="section-title" data-i18n="prob_title">Every AI product is a walled garden for memory</h2>
-      <div class="problem-grid">
-        <div class="problem-item reveal">
-          <div class="problem-num">01</div>
-          <h3 data-i18n="prob_h1">Closed ecosystems</h3>
-          <p data-i18n="prob_p1">ChatGPT Memory, Claude Memory — each is siloed. The knowledge you build in one tool
-            never reaches another.</p>
-        </div>
-        <div class="problem-item reveal">
-          <div class="problem-num">02</div>
-          <h3 data-i18n="prob_h2">Context amnesia</h3>
-          <p data-i18n="prob_p2">Switch models, switch clients, or start a new session — and everything you established
-            is gone. Agents start from zero, every time.</p>
-        </div>
-        <div class="problem-item reveal">
-          <div class="problem-num">03</div>
-          <h3 data-i18n="prob_h3">No user control</h3>
-          <p data-i18n="prob_p3">You can't audit what's stored, delete specific memories, or migrate your data. Your
-            knowledge lives at someone else's address.</p>
-        </div>
-      </div>
-      <div class="problem-statement reveal">
-        <p data-i18n="prob_stat">This isn't a bug in any single product. It's a structural gap — memory has been treated
-          as a product feature when it should be an independent infrastructure layer, like a database or a version
-          control system.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ─── PRINCIPLES ───────────────────────────────────────── -->
-  <section id="principles" class="section section-alt">
-    <div class="container">
-      <div class="section-label" data-i18n="prin_label">Design Philosophy</div>
-      <h2 class="section-title" data-i18n="prin_title">Six principles that govern every decision</h2>
-      <div class="principles-grid">
-        <div class="principle reveal">
-          <div class="principle-rank">P1</div>
-          <h3 data-i18n="prin_h1">User data sovereignty</h3>
-          <p data-i18n="prin_p1">Memory belongs to you. Self-deploy, self-manage, export everything, delete for real. No
-            external accounts required.</p>
-        </div>
-        <div class="principle reveal">
-          <div class="principle-rank">P2</div>
-          <h3 data-i18n="prin_h2">Explicit control over automation</h3>
-          <p data-i18n="prin_p2">Stage one: write only when you say so. Auto-write is opt-in, always transparent, always
-            reversible.</p>
-        </div>
-        <div class="principle reveal">
-          <div class="principle-rank">P3</div>
-          <h3 data-i18n="prin_h3">Memory and history are different things</h3>
-          <p data-i18n="prin_p3">Stable Memory stores distilled facts. History Recall stores process context. Conflating
-            them destroys recall quality.</p>
-        </div>
-        <div class="principle reveal">
-          <div class="principle-rank">P4</div>
-          <h3 data-i18n="prin_h4">Model and host agnostic</h3>
-          <p data-i18n="prin_p4">No dependency on any vendor's native memory API. Plugin any LLM or embedding model.
-            Agent stops working? Core keeps running.</p>
-        </div>
-        <div class="principle reveal">
-          <div class="principle-rank">P5</div>
-          <h3 data-i18n="prin_h5">Recall is not search</h3>
-          <p data-i18n="prin_p5">Recall returns a compacted, token-budgeted context block ready to inject. Search
-            returns a list. They are different operations.</p>
-        </div>
-        <div class="principle reveal">
-          <div class="principle-rank">P6</div>
-          <h3 data-i18n="prin_h6">Closed loop first</h3>
-          <p data-i18n="prin_p6">Ship the minimum verifiable loop. Incremental complexity on top of a proven foundation
-            — not features woven into an unproven base.</p>
-        </div>
-      </div>
-      <div class="priority-chain reveal">
-        <div class="pc-label" data-i18n="pc_label">Conflict resolution order:</div>
-        <div class="pc-chain">
-          <span data-i18n="pc_c1">Data Sovereignty</span>
-          <span class="arr">›</span>
-          <span data-i18n="pc_c2">Explicit Control</span>
-          <span class="arr">›</span>
-          <span data-i18n="pc_c3">Separation</span>
-          <span class="arr">›</span>
-          <span data-i18n="pc_c4">Agnosticism</span>
-          <span class="arr">›</span>
-          <span data-i18n="pc_c5">Recall Quality</span>
-          <span class="arr">›</span>
-          <span data-i18n="pc_c6">Simplicity</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ─── ARCHITECTURE ─────────────────────────────────────── -->
-  <section id="architecture" class="section">
-    <div class="container">
-      <div class="section-label" data-i18n="arch_label">Architecture</div>
-      <h2 class="section-title" data-i18n="arch_title">Six layers, three pipelines, one stable API surface</h2>
-      <div class="arch-layout">
-        <div class="arch-diagram reveal">
-          <div class="layer layer-1"><span class="layer-label">Layer 1</span><span class="layer-name"
-              data-i18n="arch_l1">Client / Agent Layer</span><span class="layer-desc" data-i18n="arch_l1d">Codex ·
-              Antigravity · Claude Desktop · IDE Agent · CLI</span></div>
-          <div class="layer-arrow">↓</div>
-          <div class="layer layer-2"><span class="layer-label">Layer 2</span><span class="layer-name"
-              data-i18n="arch_l2">Access Adapter Layer</span><span class="layer-desc" data-i18n="arch_l2d">Skill · Tool
-              · MCP Server · CLI · SDK</span></div>
-          <div class="layer-arrow">↓</div>
-          <div class="layer layer-3 layer-core"><span class="layer-label">Layer 3</span><span class="layer-name"
-              data-i18n="arch_l3">Memory Orchestrator</span>
-            <div class="layer-pipes"><span data-i18n="arch_p1">Write Pipeline</span><span data-i18n="arch_p2">Recall
-                Pipeline</span><span data-i18n="arch_p3">Control Pipeline</span></div>
-          </div>
-          <div class="layer-arrow">↓</div>
-          <div class="layer layer-4"><span class="layer-label">Layer 4</span><span class="layer-name"
-              data-i18n="arch_l4">Memory Storage Plane</span><span class="layer-desc" data-i18n="arch_l4d">Stable Memory
-              Store · History Recall Store · Control Metadata</span></div>
-          <div class="layer-arrow">↓</div>
-          <div class="layer layer-5"><span class="layer-label">Layer 5</span><span class="layer-name"
-              data-i18n="arch_l5">Search &amp; Ranking</span><span class="layer-desc" data-i18n="arch_l5d">Lexical ·
-              Vector (pgvector) · RRF Fusion · Tag &amp; Scope Filter</span></div>
-          <div class="layer-arrow">↓</div>
-          <div class="layer layer-6"><span class="layer-label">Layer 6</span><span class="layer-name"
-              data-i18n="arch_l6">Storage / Infra</span><span class="layer-desc" data-i18n="arch_l6d">PostgreSQL · Redis
-              · Object Store · TLS · Reverse Proxy</span></div>
-        </div>
-        <div class="arch-callouts">
-          <div class="callout reveal">
-            <h4 data-i18n="arch_c1t">Adapters are thin</h4>
-            <p data-i18n="arch_c1p">Every adapter maps intent to a standard API call. All business logic lives
-              server-side. Adding a new agent requires only a new adapter — the core never changes.</p>
-          </div>
-          <div class="callout reveal">
-            <h4 data-i18n="arch_c2t">Orchestrator is the brain</h4>
-            <p data-i18n="arch_c2p">Layer 3 answers: is this worth storing? which layer? when recalled, what fits? It is
-              judgment and scheduling, not storage.</p>
-          </div>
-          <div class="callout reveal">
-            <h4 data-i18n="arch_c3t">Search degrades gracefully</h4>
-            <p data-i18n="arch_c3p">Vector search and lexical search fail independently. No embedding provider means
-              pure lexical. zhparser unavailable means plainto_tsquery. The pipeline never crashes from a missing
-              dependency.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ─── DUAL-LAYER ───────────────────────────────────────── -->
-  <section id="features" class="section section-alt">
-    <div class="container">
-      <div class="section-label" data-i18n="feat_label">Core Design</div>
-      <h2 class="section-title" data-i18n="feat_title">Two kinds of memory. One unified system.</h2>
-      <div class="dual-layer reveal">
-        <div class="layer-card stable">
-          <div class="lc-header">
-            <div class="lc-badge" data-i18n="feat_s_t">Stable Memory</div>
-            <div class="lc-subtitle" data-i18n="feat_s_d">Long-term, high-fidelity facts</div>
-          </div>
-          <div class="lc-types">
-            <span>preference</span><span>project_rule</span><span>decision</span>
-            <span>fact</span><span>workflow</span><span>reference</span><span>summary</span>
-          </div>
-          <ul class="lc-traits">
-            <li data-i18n="feat_s_l1">Low write frequency, high read frequency</li>
-            <li data-i18n="feat_s_l2">Versioned — every change is tracked</li>
-            <li data-i18n="feat_s_l3">State machine: active → archived / invalid → deleted</li>
-            <li data-i18n="feat_s_l4">semantic_key deduplication prevents clutter</li>
-            <li data-i18n="feat_s_l5">importance ≥ 0.9 cannot be truncated by token budget</li>
-          </ul>
-        </div>
-        <div class="layer-sep">
-          <div class="vs-line"></div>
-          <div class="vs-label">vs</div>
-          <div class="vs-line"></div>
-        </div>
-        <div class="layer-card history">
-          <div class="lc-header">
-            <div class="lc-badge" data-i18n="feat_h_t">History Recall</div>
-            <div class="lc-subtitle" data-i18n="feat_h_d">Process context, allowed to expire</div>
-          </div>
-          <div class="lc-types">
-            <span>task_summary</span><span>decision_trace</span><span>session_excerpt</span>
-            <span>recent_progress</span><span>incident_context</span><span>meeting_note</span>
-          </div>
-          <ul class="lc-traits">
-            <li data-i18n="feat_h_l1">Append-write primary — no overwrite pressure</li>
-            <li data-i18n="feat_h_l2">TTL policy support (30d / 90d / 365d / permanent)</li>
-            <li data-i18n="feat_h_l3">Lower structure constraints — richer freeform text</li>
-            <li data-i18n="feat_h_l4">Recall weight lower — supplements stable results</li>
-          </ul>
-        </div>
-      </div>
-      <div class="memory-judge-intro reveal">
-        <div class="mj-text">
-          <h3 data-i18n="mj_h3">Memory Judge decides where things go</h3>
-          <p data-i18n="mj_p" data-i18n-html="true">A three-stage decision chain runs on every write request. Hard rules
-            run first and <em>cannot</em> be overridden by the LLM. The LLM is advisory. The rule fallback is always
-            available.</p>
-        </div>
-        <div class="mj-chain">
-          <div class="chain-step">
-            <div class="cs-num">L1</div>
-            <div class="cs-label" data-i18n="cs1_l">Hard Guards</div>
-            <div class="cs-desc" data-i18n="cs1_d">Sensitive content, empty inputs, length violations — deterministic,
-              cannot be overridden</div>
-          </div>
-          <div class="chain-arr">→</div>
-          <div class="chain-step">
-            <div class="cs-num">L2</div>
-            <div class="cs-label" data-i18n="cs2_l">LLM Judge</div>
-            <div class="cs-desc" data-i18n="cs2_d">Structured JSON output; confidence threshold enforced; auto-fallback
-              on failure</div>
-          </div>
-          <div class="chain-arr">→</div>
-          <div class="chain-step">
-            <div class="cs-num">L3</div>
-            <div class="cs-label" data-i18n="cs3_l">Rule Fallback</div>
-            <div class="cs-desc" data-i18n="cs3_d">Admin-configurable rule table; keyword classification, importance
-              defaults, semantic_key inference</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ─── RECALL ───────────────────────────────────────────── -->
-  <section id="recall" class="section">
-    <div class="container">
-      <div class="section-label" data-i18n="rec_label">Recall Orchestrator</div>
-      <h2 class="section-title" data-i18n="rec_title">Recall is not search. It's context engineering.</h2>
-      <p class="section-intro" data-i18n="rec_p" data-i18n-md="true">The Recall Orchestrator runs eight steps to produce
-        a <code>RecallContextBlock</code> — a compacted, deduplicated, token-budgeted block ready to inject directly
-        into any agent's context window.</p>
-      <div class="recall-flow reveal">
-        <div class="rf-step"><span class="rf-num">1</span><span class="rf-label" data-i18n="rf1_l">Candidate
-            retrieval</span><span class="rf-note" data-i18n="rf1_n">Hybrid: lexical + vector, both stores</span></div>
-        <div class="rf-step"><span class="rf-num">2</span><span class="rf-label" data-i18n="rf2_l">Scoring</span><span
-            class="rf-note" data-i18n="rf2_n">importance × recency × hybridScore</span></div>
-        <div class="rf-step"><span class="rf-num">3</span><span class="rf-label" data-i18n="rf3_l">Sorting</span><span
-            class="rf-note" data-i18n="rf3_n">Descending by composite score</span></div>
-        <div class="rf-step"><span class="rf-num">4</span><span class="rf-label" data-i18n="rf4_l">semantic_key
-            dedup</span><span class="rf-note" data-i18n="rf4_n">Same key → only highest-score entry</span></div>
-        <div class="rf-step"><span class="rf-num">5</span><span class="rf-label" data-i18n="rf5_l">Conflict
-            detection</span><span class="rf-note" data-i18n="rf5_n">hasConflict flagged memories surfaced</span></div>
-        <div class="rf-step"><span class="rf-num">6</span><span class="rf-label" data-i18n="rf6_l">Token
-            budget</span><span class="rf-note" data-i18n="rf6_n">stable/history split by prefer param</span></div>
-        <div class="rf-step"><span class="rf-num">7</span><span class="rf-label" data-i18n="rf7_l">Freshness
-            notes</span><span class="rf-note" data-i18n="rf7_n">30/90/365-day warn thresholds</span></div>
-        <div class="rf-step"><span class="rf-num">8</span><span class="rf-label" data-i18n="rf8_l">Block
-            assembly</span><span class="rf-note" data-i18n="rf8_n">RecallContextBlock returned</span></div>
-      </div>
-      <div class="recall-prefer reveal">
-        <div class="rp-label" data-i18n="rp_label" data-i18n-md="true">Token budget allocation by <code>prefer</code>
-          mode:</div>
-        <div class="rp-table">
-          <div class="rp-row header"><span>Mode</span><span>Stable</span><span>History</span></div>
-          <div class="rp-row"><span class="mode">stable_first</span><span class="bar-cell">
-              <div class="bar stable" style="width:70%"></div><span>70%</span>
-            </span><span class="bar-cell">
-              <div class="bar history" style="width:30%"></div><span>30%</span>
-            </span></div>
-          <div class="rp-row"><span class="mode">history_first</span><span class="bar-cell">
-              <div class="bar stable" style="width:30%"></div><span>30%</span>
-            </span><span class="bar-cell">
-              <div class="bar history" style="width:70%"></div><span>70%</span>
-            </span></div>
-          <div class="rp-row"><span class="mode">balanced</span><span class="bar-cell">
-              <div class="bar stable" style="width:50%"></div><span>50%</span>
-            </span><span class="bar-cell">
-              <div class="bar history" style="width:50%"></div><span>50%</span>
-            </span></div>
-          <div class="rp-row"><span class="mode">stable_only</span><span class="bar-cell">
-              <div class="bar stable" style="width:100%"></div><span>100%</span>
-            </span><span class="bar-cell"><span class="dim">—</span></span></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ─── API ──────────────────────────────────────────────── -->
-  <section id="api" class="section section-alt">
-    <div class="container">
-      <div class="section-label" data-i18n="api_label">API Reference</div>
-      <h2 class="section-title" data-i18n="api_title">A stable, versioned REST surface</h2>
-      <p class="section-intro" data-i18n="api_p" data-i18n-md="true">All endpoints return
-        <code>{"{ code, message, data, httpStatus, timestamp }"}</code>. Errors use structured <code>MEM-*</code> codes,
-        never raw HTTP status text.
-      </p>
-      <div class="api-layout">
-        <div class="api-nav">
-          <button class="api-tab active" data-tab="write" data-i18n="api_w">Write</button>
-          <button class="api-tab" data-tab="recall" data-i18n="api_r">Recall</button>
-          <button class="api-tab" data-tab="control" data-i18n="api_c">Control</button>
-          <button class="api-tab" data-tab="auth" data-i18n="api_a">Auth &amp; Tokens</button>
-        </div>
-        <div class="api-panels">
-
-          <div class="api-panel active" id="tab-write">
-            <div class="endpoint"><span class="method post">POST</span><span class="path">/v1/memories</span><span
-                class="ep-desc" data-i18n="ep_w1">Write a stable memory</span></div>
-            <pre class="code-block"><code><span class="c">// Request body</span>
+<body class="navigation-with-keyboard">
+<svg style="display: none;"><defs>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>!function(){var t=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();document.documentElement.setAttribute("data-theme",t||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")),document.documentElement.setAttribute("data-theme-choice",t||"system")}(),function(){try{const n=new URLSearchParams(window.location.search).entries();for(var[t,e]of n)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}(),document.documentElement.setAttribute("data-announcement-bar-initially-dismissed",function(){try{return"true"===localStorage.getItem("docusaurus.announcement.dismiss")}catch(t){}return!1}())</script><div id="__docusaurus"><link rel="preload" as="image" href="/img/羽忆-origin.png"><div role="region" aria-label="跳到主要内容"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">跳到主要内容</a></div><nav class="navbar_zEgb"><div class="navInner_ua7v"><a href="/" class="navLogo_lS8K"><img src="/img/羽忆-origin.png" alt="PlumeMemory Logo" class="logoImage_gghG"><span class="logoText_iXKl">羽忆</span></a><div class="navMenuWrapper_LKC1"><ul class="navLinks_jcSG"><li><a href="#architecture">架构设计</a></li><li><a href="#features">核心设计</a></li><li><a href="#api">API 参考</a></li><li><a href="#deploy">快速部署</a></li><li><a href="/docs/intro">文档</a></li></ul><div class="navActions_LzKJ"><div class="controls_PfTX"><select class="controlSelect_rFl6" aria-label="Switch language"><option value="en">EN</option><option value="zh-CN" selected="">简体中文</option></select><button type="button" class="controlButton_LeBO" aria-label="Toggle theme"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><a href="https://github.com/plumememory/yuyi" class="ghostButton_LSmr" target="_blank" rel="noreferrer">GitHub</a><a href="#deploy" class="primaryButton_k12r">立即开始</a></div></div><button type="button" class="navToggle_c_VK" aria-label="Toggle menu"><span></span><span></span><span></span></button></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_z2l0"><main class="page_MTaU"><section id="hero" class="heroSection_DhyZ"><div class="heroInner_KuUI"><div><div class="heroBadge_g4al">开源免费 · 私有化部署 · v0.1 MVP</div><h1 class="heroHeadline_hwIc"><span>Shared Memory.</span><br><em>Unified Soul.</em></h1><p class="heroSub_yuyT">羽忆为您的所有 AI Agent 提供一个统一的、持久化的记忆层，部署在您自己的基础架构上，数据完全由您掌控，所有工具共享。</p><div class="heroActions_vPxy"><a href="#deploy" class="primaryButtonLarge_HDfH">快速部署</a><a class="ghostButtonLarge_rQrG" href="/docs/intro">查阅文档</a></div><div class="heroMeta_zv2s"><span>Java 21 + Spring Boot</span><span class="heroMetaSeparator_Vocy">·</span><span>PostgreSQL + pgvector</span><span class="heroMetaSeparator_Vocy">·</span><span>MCP / CLI / REST</span></div></div><div class="terminalCard_iiRT"><div class="terminalBar_Wghn"><span class="terminalDot_oeLB dotRed_A8Sc"></span><span class="terminalDot_oeLB dotYellow_BzXx"></span><span class="terminalDot_oeLB dotGreen_Ig9j"></span><span class="terminalTitle_Qz0a">memory-server</span></div><pre class="terminalBody_l8bJ"><code># Write a memory from any agent<!-- -->
+<!-- -->$ curl -X POST https://memory.local/v1/memories \<!-- -->
+<!-- -->    -H &quot;Authorization: Bearer mk-...&quot; \<!-- -->
+<!-- -->    -d &#x27;{<!-- -->
+<!-- -->  &quot;content&quot;: &quot;All API responses follow {code, message, data}&quot;,<!-- -->
+<!-- -->  &quot;memoryType&quot;: &quot;project_rule&quot;,<!-- -->
+<!-- -->  &quot;scope&quot;: { &quot;projectId&quot;: &quot;p_demo&quot; }<!-- -->
+<!-- -->}&#x27;<!-- -->
+<!-- -->
+<!-- -->{<!-- -->
+<!-- -->  &quot;code&quot;: &quot;CREATED&quot;,<!-- -->
+<!-- -->  &quot;data&quot;: {<!-- -->
+<!-- -->    &quot;id&quot;: &quot;mem_a1b2c3d4&quot;,<!-- -->
+<!-- -->    &quot;memoryType&quot;: &quot;project_rule&quot;,<!-- -->
+<!-- -->    &quot;importance&quot;: 0.9,<!-- -->
+<!-- -->    &quot;status&quot;: &quot;active&quot;<!-- -->
+<!-- -->  }<!-- -->
+<!-- -->}<!-- -->
+<!-- -->
+<!-- --># Recall context for a task from any other agent<!-- -->
+<!-- -->$ curl -X POST https://memory.local/v1/recall \<!-- -->
+<!-- -->    -d &#x27;{ &quot;task&quot;: &quot;Implement user registration&quot;, &quot;maxTokens&quot;: 2000 }&#x27;</code></pre></div></div><div class="heroFade_xZdA"></div></section><section id="problem" class="section_HYzw"><div class="container_L8UQ"><div class="sectionLabel_trO2">面临的问题</div><h2 class="sectionTitle_dRp2">AI 模型运行于记忆孤岛之中</h2><div class="problemGrid_t3Cm reveal_xowv" data-reveal="true"><article class="problemItem_hSb5"><div class="problemNumber_hK5M">01</div><h3>封闭的生态</h3><p>ChatGPT 记忆、Claude 记忆，每一个都是孤立的。你在一个工具中建立的知识永远无法被另一个工具使用。</p></article><article class="problemItem_hSb5"><div class="problemNumber_hK5M">02</div><h3>上下文失忆</h3><p>切换模型、切换客户端或者开始新会话，你所建立的一切都会消失。Agent 每次都在从零开始。</p></article><article class="problemItem_hSb5"><div class="problemNumber_hK5M">03</div><h3>失去数据控制权</h3><p>你无法审计存储了什么，无法精细删除指定记忆，也无法迁移数据。你的知识存放在别人的服务器上。</p></article></div><div class="problemStatement_FyKM reveal_xowv" data-reveal="true"><p>记忆在传统上常常作为依附于应用层面的一项产品特性存在。构建独立的基础设施层，才是解决数据持久化和跨模型协同的关键。</p></div></div></section><section id="principles" class="section_HYzw sectionAlt_sMAb"><div class="container_L8UQ"><div class="sectionLabel_trO2">设计理念</div><h2 class="sectionTitle_dRp2">主导每一个架构决策的六大原则</h2><div class="principlesGrid_US0E reveal_xowv" data-reveal="true"><article class="principle_qg1X"><div class="principleRank_c_U4">P1</div><h3>用户数据主权绝对优先</h3><p>记忆只属于你。私有化部署、自主管理、支持全量导出和物理删除。无需任何外部账号。</p></article><article class="principle_qg1X"><div class="principleRank_c_U4">P2</div><h3>显式控制一切自动化行为</h3><p>第一阶段只在你允许时写入。自动写入必须是选择加入的，并且永远透明、可逆转。</p></article><article class="principle_qg1X"><div class="principleRank_c_U4">P3</div><h3>记忆和历史是不同的事物</h3><p>Stable Memory 存储提炼后的事实，History Recall 存储过程上下文。将二者混为一谈会严重破坏召回质量。</p></article><article class="principle_qg1X"><div class="principleRank_c_U4">P4</div><h3>模型和宿主隔离</h3><p>不绑定任何厂商原生的记忆 API。可以接入任何 LLM 或向量模型。某个 Agent 挂了，核心基础设施依然运转。</p></article><article class="principle_qg1X"><div class="principleRank_c_U4">P5</div><h3>确定性上下文装配</h3><p>系统召回管线会输出受 Token 预算约束的信息块，直接供大模型注入上下文，在机制上区别于传统文档检索。</p></article><article class="principle_qg1X"><div class="principleRank_c_U4">P6</div><h3>闭环优先</h3><p>优先交付最小可验证的全链路闭环。在经受考验的基础上渐进增加复杂度，而不是在未经验证的地基上堆砌特性。</p></article></div><div class="priorityChain_l954 reveal_xowv" data-reveal="true"><div class="priorityLabel_ceLB">冲突解决优先级模型：</div><div class="priorityItems_BsIE"><span>数据主权</span><span class="priorityArrow_Lz1_">›</span><span>显式控制</span><span class="priorityArrow_Lz1_">›</span><span>双层隔离</span><span class="priorityArrow_Lz1_">›</span><span>模型中立</span><span class="priorityArrow_Lz1_">›</span><span>召回质量</span><span class="priorityArrow_Lz1_">›</span><span>极简实现</span></div></div></div></section><section id="architecture" class="section_HYzw"><div class="container_L8UQ"><div class="sectionLabel_trO2">技术架构</div><h2 class="sectionTitle_dRp2">六层架构，三条管线，极度稳定的 API</h2><div class="archLayout_HbUf"><div class="archDiagram_NkdT reveal_xowv" data-reveal="true"><div class="layer_vF22"><span class="layerLabel_ZcLI">Layer 1</span><span class="layerName_f5OK">客户端 / 智能体层</span><span class="layerDescription__RmX">Codex · Antigravity · Claude Desktop · IDE Agent · CLI</span></div><div class="layerArrow_Ux2y">↓</div><div class="layer_vF22"><span class="layerLabel_ZcLI">Layer 2</span><span class="layerName_f5OK">接入适配器层</span><span class="layerDescription__RmX">技能 · 工具 · MCP 服务器 · CLI · SDK</span></div><div class="layerArrow_Ux2y">↓</div><div class="layer_vF22 layerCore_xESH"><span class="layerLabel_ZcLI">Layer 3</span><span class="layerName_f5OK">记忆编排器层</span><div class="layerPipes_mxiG"><span>写入管线</span><span>召回管线</span><span>控制管线</span></div></div><div class="layerArrow_Ux2y">↓</div><div class="layer_vF22"><span class="layerLabel_ZcLI">Layer 4</span><span class="layerName_f5OK">记忆存储平面</span><span class="layerDescription__RmX">稳定记忆库 · 历史召回库 · 控制元数据</span></div><div class="layerArrow_Ux2y">↓</div><div class="layer_vF22"><span class="layerLabel_ZcLI">Layer 5</span><span class="layerName_f5OK">检索与排序层</span><span class="layerDescription__RmX">词法 · 向量 (pgvector) · RRF 融合 · Tag &amp; Scope 过滤</span></div><div class="layerArrow_Ux2y">↓</div><div class="layer_vF22"><span class="layerLabel_ZcLI">Layer 6</span><span class="layerName_f5OK">存储基础设施层</span><span class="layerDescription__RmX">PostgreSQL · Redis · 对象存储 · TLS · 反向代理</span></div></div><div class="archCallouts_OFnI"><article class="callout_x_S4 reveal_xowv" data-reveal="true"><h4>极致轻薄的适配器</h4><p>每个适配器只负责把用户意图映射为标准 API 调用。所有业务逻辑都在服务端闭环，接入新 Agent 只需新增适配器。</p></article><article class="callout_x_S4 reveal_xowv" data-reveal="true"><h4>编排器负责判断与调度</h4><p>第三层回答的是这值不值得存、该落哪一层、召回时什么能进上下文。它是调度中心，而不是单纯的数据库代理。</p></article><article class="callout_x_S4 reveal_xowv" data-reveal="true"><h4>搜索链路支持优雅降级</h4><p>向量检索和词法检索独立容灾。没有 Embedding Provider 就回退纯词法，zhparser 不可用也不会让整条管线失效。</p></article></div></div></div></section><section id="features" class="section_HYzw sectionAlt_sMAb"><div class="container_L8UQ"><div class="sectionLabel_trO2">核心设计</div><h2 class="sectionTitle_dRp2">两种记忆，一套统一系统</h2><div class="dualLayer_CL8f reveal_xowv" data-reveal="true"><article class="layerCard_kpeH stableCard_OCRw"><div class="layerCardHeader_iXfC"><div class="layerCardBadge_uiH0">稳定记忆</div><div class="layerCardSubtitle__ADC">长期存在的高保真事实</div></div><div class="layerCardTypes_klJP"><span>preference</span><span>project_rule</span><span>decision</span><span>fact</span><span>workflow</span><span>reference</span><span>summary</span></div><ul class="layerCardTraits_K7r5"><li>低写入频率，高读取频率</li><li>版本化管理，每次变更都可追踪</li><li>状态机：active → archived / invalid → deleted</li><li>semantic_key 去重，避免记忆碎片化</li><li>importance ≥ 0.9 时不会被 Token 预算裁剪</li></ul></article><div class="layerSeparator_mwEs"><div class="separatorLine_mYIW"></div><div class="separatorLabel_UnE2">vs</div><div class="separatorLine_mYIW"></div></div><article class="layerCard_kpeH historyCard_P1mh"><div class="layerCardHeader_iXfC"><div class="layerCardBadge_uiH0">历史召回</div><div class="layerCardSubtitle__ADC">面向过程上下文，允许过期</div></div><div class="layerCardTypes_klJP"><span>task_summary</span><span>decision_trace</span><span>session_excerpt</span><span>recent_progress</span><span>incident_context</span><span>meeting_note</span></div><ul class="layerCardTraits_K7r5"><li>以追加写入为主，不强调覆盖更新</li><li>支持 TTL 策略（30d / 90d / 365d / permanent）</li><li>结构约束更弱，更适合自由文本</li><li>召回权重更低，主要用来补充稳定记忆</li></ul></article></div><div class="judgeCard_QcKM reveal_xowv" data-reveal="true"><div class="judgeText_fecI"><h3>Memory Judge 决定内容该去哪里</h3><p>每次写入都会先过一条三阶段决策链。硬规则会最先执行，而且 <em>不能</em> 被 LLM 覆盖。模型只负责辅助判断，规则兜底永远存在。</p></div><div class="judgeSteps_qLIV"><div class="judgeStep_k9Fe"><div class="judgeStepLevel_Olgo">L1</div><div class="judgeStepLabel_OLVo">硬规则防线</div><div class="judgeStepDescription_lEca">敏感内容、空输入、长度越界等规则先执行，而且不能被后续判断覆盖。</div></div><div class="judgeStepArrow_pRb2">→</div><div class="judgeStep_k9Fe"><div class="judgeStepLevel_Olgo">L2</div><div class="judgeStepLabel_OLVo">LLM Judge</div><div class="judgeStepDescription_lEca">输出结构化 JSON，校验置信度阈值；模型失败时会自动回退，不把主流程绑死在模型上。</div></div><div class="judgeStepArrow_pRb2">→</div><div class="judgeStep_k9Fe"><div class="judgeStepLevel_Olgo">L3</div><div class="judgeStepLabel_OLVo">规则兜底</div><div class="judgeStepDescription_lEca">管理员可配置规则表，补足关键词分类、importance 默认值和 semantic_key 推断。</div></div></div></div></div></section><section id="recall" class="section_HYzw"><div class="container_L8UQ"><div class="sectionLabel_trO2">召回编排器</div><h2 class="sectionTitle_dRp2">召回不是搜索，而是上下文工程</h2><p class="sectionIntro_iG0v">Recall Orchestrator 会经过八个步骤，最终生成 <code>RecallContextBlock</code>。它不是简单的检索结果列表，而是已经压缩、 去重、受 Token 预算约束、可以直接注入 Agent 上下文的记忆块。</p><div class="recallFlow_U1mS reveal_xowv" data-reveal="true"><article class="recallStep_KvRh"><span class="recallStepNumber_Cg0R">1</span><span class="recallStepLabel_nvr4">候选召回</span><span class="recallStepNote_rE13">稳定记忆与历史材料都走词法 + 向量混合召回</span></article><article class="recallStep_KvRh"><span class="recallStepNumber_Cg0R">2</span><span class="recallStepLabel_nvr4">统一打分</span><span class="recallStepNote_rE13">综合 hybridScore、importance 与 recency 进行排序</span></article><article class="recallStep_KvRh"><span class="recallStepNumber_Cg0R">3</span><span class="recallStepLabel_nvr4">主序排序</span><span class="recallStepNote_rE13">按综合分值降序处理候选集</span></article><article class="recallStep_KvRh"><span class="recallStepNumber_Cg0R">4</span><span class="recallStepLabel_nvr4">semantic_key 去重</span><span class="recallStepNote_rE13">同一语义键只保留分值更高的版本</span></article><article class="recallStep_KvRh"><span class="recallStepNumber_Cg0R">5</span><span class="recallStepLabel_nvr4">冲突识别</span><span class="recallStepNote_rE13">把 hasConflict 标记的结果前置暴露</span></article><article class="recallStep_KvRh"><span class="recallStepNumber_Cg0R">6</span><span class="recallStepLabel_nvr4">Token 预算分配</span><span class="recallStepNote_rE13">根据 prefer 策略在稳定记忆和历史材料之间切分预算</span></article><article class="recallStep_KvRh"><span class="recallStepNumber_Cg0R">7</span><span class="recallStepLabel_nvr4">时效性提示</span><span class="recallStepNote_rE13">超过 30/90/365 天的内容会附带新鲜度提示</span></article><article class="recallStep_KvRh"><span class="recallStepNumber_Cg0R">8</span><span class="recallStepLabel_nvr4">上下文块装配</span><span class="recallStepNote_rE13">最终生成可直接注入模型上下文的 RecallContextBlock</span></article></div><div class="budgetPanel_twIP reveal_xowv" data-reveal="true"><div class="budgetLabel_rii_">按 <code>prefer</code> 模式分配 Token 预算：</div><div class="budgetTable_PwiM"><div class="budgetRow_bnpA budgetHeader_fXiE"><span>Mode</span><span>Stable</span><span>History</span></div><div class="budgetRow_bnpA"><span class="budgetMode_GYQd">stable_first</span><span class="budgetBarCell_ZpAG"><div class="budgetBar_c1a6 stableBar_p3hz" style="width:70%"></div><span>70%</span></span><span class="budgetBarCell_ZpAG"><div class="budgetBar_c1a6 historyBar_WYWU" style="width:30%"></div><span>30%</span></span></div><div class="budgetRow_bnpA"><span class="budgetMode_GYQd">history_first</span><span class="budgetBarCell_ZpAG"><div class="budgetBar_c1a6 stableBar_p3hz" style="width:30%"></div><span>30%</span></span><span class="budgetBarCell_ZpAG"><div class="budgetBar_c1a6 historyBar_WYWU" style="width:70%"></div><span>70%</span></span></div><div class="budgetRow_bnpA"><span class="budgetMode_GYQd">balanced</span><span class="budgetBarCell_ZpAG"><div class="budgetBar_c1a6 stableBar_p3hz" style="width:50%"></div><span>50%</span></span><span class="budgetBarCell_ZpAG"><div class="budgetBar_c1a6 historyBar_WYWU" style="width:50%"></div><span>50%</span></span></div><div class="budgetRow_bnpA"><span class="budgetMode_GYQd">stable_only</span><span class="budgetBarCell_ZpAG"><div class="budgetBar_c1a6 stableBar_p3hz" style="width:100%"></div><span>100%</span></span><span class="budgetBarCell_ZpAG"><span class="budgetEmpty_LBZU">—</span></span></div></div></div></div></section><section id="api" class="section_HYzw sectionAlt_sMAb"><div class="container_L8UQ"><div class="sectionLabel_trO2">API 参考</div><h2 class="sectionTitle_dRp2">稳定、版本化的 REST 接口表面</h2><p class="sectionIntro_iG0v">所有接口统一返回 <code>{ code, message, data, httpStatus, timestamp }</code> 结构。错误响应使用稳定的<!-- --> <code>MEM-*</code> 业务码，而不是直接把 HTTP 状态文本暴露给接入层。</p><div class="apiLayout_jSfs"><div class="apiNav_dXlN"><button type="button" class="apiTab_UGlM apiTabActive__jEZ">写入</button><button type="button" class="apiTab_UGlM">召回</button><button type="button" class="apiTab_UGlM">控制</button><button type="button" class="apiTab_UGlM">认证与令牌</button></div><div class="apiPanel_G21B"><div class=""><div class="endpoint_ksRS"><span class="methodBadge_Fubf methodPost_Z1Fb">POST</span><span class="endpointPath_CNfh">/v1/memories</span><span class="endpointDescription_MOKl">写入一条稳定记忆</span></div><pre class="codeBlock_je8t"><code>// Request body
 {
-  <span class="key">"content"</span>: <span class="str">"All backend APIs return {code, message, data}"</span>,
-  <span class="key">"title"</span>:   <span class="str">"Response format convention"</span>,
-  <span class="key">"memoryType"</span>: <span class="str">"project_rule"</span>,
-  <span class="key">"scope"</span>: { <span class="key">"projectId"</span>: <span class="str">"p_demo"</span> },
-  <span class="key">"semanticKey"</span>: <span class="str">"p_demo:rule:api_response_format"</span>,
-  <span class="key">"importance"</span>: <span class="num">0.9</span>
+  &quot;content&quot;: &quot;All backend APIs return {code, message, data}&quot;,
+  &quot;title&quot;: &quot;Response format convention&quot;,
+  &quot;memoryType&quot;: &quot;project_rule&quot;,
+  &quot;scope&quot;: { &quot;projectId&quot;: &quot;p_demo&quot; },
+  &quot;semanticKey&quot;: &quot;p_demo:rule:api_response_format&quot;,
+  &quot;importance&quot;: 0.9
 }
 
-<span class="c">// Response 201</span>
+// Response 201
 {
-  <span class="key">"code"</span>: <span class="str">"CREATED"</span>,
-  <span class="key">"data"</span>: { <span class="key">"id"</span>: <span class="str">"mem_a1b2c3d4"</span>, <span class="key">"status"</span>: <span class="str">"active"</span>, <span class="key">"version"</span>: <span class="num">1</span> }
-}</code></pre>
-            <div class="endpoint mt"><span class="method post">POST</span><span
-                class="path">/v1/history-records</span><span class="ep-desc" data-i18n="ep_w2">Write a history
-                record</span></div>
-            <pre class="code-block"><code>{
-  <span class="key">"content"</span>: <span class="str">"Completed user auth module. MailCodeService handles TTL."</span>,
-  <span class="key">"recordKind"</span>: <span class="str">"task_summary"</span>,
-  <span class="key">"scope"</span>: { <span class="key">"projectId"</span>: <span class="str">"p_demo"</span> },
-  <span class="key">"ttlPolicy"</span>: <span class="str">"365d"</span>
-}</code></pre>
-          </div>
-
-          <div class="api-panel" id="tab-recall">
-            <div class="endpoint"><span class="method post">POST</span><span class="path">/v1/recall</span><span
-                class="ep-desc" data-i18n="ep_r1">Task context recall</span></div>
-            <pre class="code-block"><code><span class="c">// Request</span>
-{
-  <span class="key">"task"</span>: <span class="str">"Implement user registration with email verification"</span>,
-  <span class="key">"scope"</span>: { <span class="key">"projectId"</span>: <span class="str">"p_demo"</span> },
-  <span class="key">"maxTokens"</span>: <span class="num">2000</span>,
-  <span class="key">"prefer"</span>: <span class="str">"stable_first"</span>,
-  <span class="key">"includeHistory"</span>: <span class="bool">true</span>
-}
-
-<span class="c">// Response — RecallContextBlock</span>
-{
-  <span class="key">"blockType"</span>: <span class="str">"task_recall"</span>,
-  <span class="key">"stableMemories"</span>: [
-    { <span class="key">"id"</span>: <span class="str">"mem_..."</span>, <span class="key">"summary"</span>: <span class="str">"..."</span>, <span class="key">"importance"</span>: <span class="num">0.92</span> }
-  ],
-  <span class="key">"historyRecords"</span>: [ <span class="c">/* ... */</span> ],
-  <span class="key">"conflicts"</span>: [],
-  <span class="key">"freshnessNotes"</span>: [],
-  <span class="key">"tokenEstimate"</span>: <span class="num">1420</span>,
-  <span class="key">"truncated"</span>: <span class="bool">false</span>
-}</code></pre>
-            <div class="endpoint mt"><span class="method get">GET</span><span
-                class="path">/v1/memories/recent</span><span class="ep-desc" data-i18n="ep_r2">Latest stable
-                memories</span></div>
-            <pre class="code-block"><code>GET /v1/memories/recent?projectId=p_demo&amp;limit=10</code></pre>
-          </div>
-
-          <div class="api-panel" id="tab-control">
-            <div class="endpoint"><span class="method get">GET</span><span class="path">/v1/memories</span><span
-                class="ep-desc" data-i18n="ep_c1">List memories with filters</span></div>
-            <pre
-              class="code-block"><code>GET /v1/memories?projectId=p_demo&status=active&memoryType=project_rule&hasConflict=false&page=1&size=20</code></pre>
-            <div class="endpoint mt"><span class="method patch">PATCH</span><span
-                class="path">/v1/memories/{id}/status</span><span class="ep-desc" data-i18n="ep_c2">Change memory
-                state</span></div>
-            <pre class="code-block"><code>{ <span class="key">"status"</span>: <span class="str">"archived"</span> }
-<span class="c">// Valid transitions: active→archived, active→invalid, active→deleted
-// archived→active (restore), invalid→active (restore)</span></code></pre>
-            <div class="endpoint mt"><span class="method delete">DELETE</span><span
-                class="path">/v1/memories/{id}</span><span class="ep-desc" data-i18n="ep_c3">Delete a memory</span>
-            </div>
-            <div class="endpoint mt"><span class="method get">GET</span><span
-                class="path">/v1/memories/search</span><span class="ep-desc" data-i18n="ep_c4">Full-text search</span>
-            </div>
-            <pre class="code-block"><code>GET /v1/memories/search?q=api+response+format&limit=20</code></pre>
-          </div>
-
-          <div class="api-panel" id="tab-auth">
-            <div class="endpoint"><span class="method post">POST</span><span class="path">/v1/auth/login</span><span
-                class="ep-desc" data-i18n="ep_a1">Admin login (Session Cookie)</span></div>
-            <pre class="code-block"><code>{ <span class="key">"username"</span>: <span class="str">"admin"</span>, <span class="key">"password"</span>: <span class="str">"..."</span> }
-<span class="c">// Returns HttpOnly Session Cookie for browser clients</span></code></pre>
-            <div class="endpoint mt"><span class="method post">POST</span><span
-                class="path">/v1/admin/tokens</span><span class="ep-desc" data-i18n="ep_a2">Create API Token
-                (CLI/MCP)</span></div>
-            <pre class="code-block"><code>{
-  <span class="key">"name"</span>: <span class="str">"Claude MCP"</span>,
-  <span class="key">"clientType"</span>: <span class="str">"mcp"</span>,
-  <span class="key">"accessLevel"</span>: <span class="str">"read_only"</span>,
-  <span class="key">"expiresInDays"</span>: <span class="num">30</span>
-}
-<span class="c">// Plaintext token returned only once on creation</span></code></pre>
-            <div class="endpoint mt"><span class="method post">POST</span><span
-                class="path">/v1/admin/tokens/{id}/revoke</span><span class="ep-desc" data-i18n="ep_a3">Revoke token
-                immediately</span></div>
-          </div>
-
-        </div>
-      </div>
-      <div class="error-codes reveal">
-        <h4 data-i18n="ec_h4">Error code structure</h4>
-        <div class="ec-grid">
-          <div class="ec-item"><code>MEM-AUTH*</code><span data-i18n="ec1">Authentication &amp; authorization</span>
-          </div>
-          <div class="ec-item"><code>MEM-MEM*</code><span data-i18n="ec2">Memory operation errors</span></div>
-          <div class="ec-item"><code>MEM-RECALL*</code><span data-i18n="ec3">Recall pipeline errors</span></div>
-          <div class="ec-item"><code>MEM-JUDGE*</code><span data-i18n="ec4">Judge / LLM provider errors</span></div>
-          <div class="ec-item"><code>MEM-SEARCH*</code><span data-i18n="ec5">Embedding &amp; search errors</span></div>
-          <div class="ec-item"><code>MEM-SYS*</code><span data-i18n="ec6">System &amp; validation errors</span></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ─── DEPLOY ───────────────────────────────────────────── -->
-  <section id="deploy" class="section">
-    <div class="container">
-      <div class="section-label" data-i18n="dep_label">Deployment</div>
-      <h2 class="section-title" data-i18n="dep_title">Running in under five minutes</h2>
-      <div class="deploy-grid">
-        <div class="deploy-steps">
-          <div class="step reveal">
-            <div class="step-num">1</div>
-            <div class="step-content">
-              <h4 data-i18n="dep_s1">Clone the deploy repo</h4>
-              <pre class="code-block"><code>git clone https://github.com/plumememory/memory-deploy
-cd memory-deploy</code></pre>
-            </div>
-          </div>
-          <div class="step reveal">
-            <div class="step-num">2</div>
-            <div class="step-content">
-              <h4 data-i18n="dep_s2">Configure environment</h4>
-              <pre class="code-block"><code>cp .env.example .env
-<span class="c"># Set required variables:</span>
+  &quot;code&quot;: &quot;CREATED&quot;,
+  &quot;data&quot;: { &quot;id&quot;: &quot;mem_a1b2c3d4&quot;, &quot;status&quot;: &quot;active&quot;, &quot;version&quot;: 1 }
+}</code></pre></div><div class="endpointGroupSpacing_DMwY"><div class="endpoint_ksRS"><span class="methodBadge_Fubf methodPost_Z1Fb">POST</span><span class="endpointPath_CNfh">/v1/history-records</span><span class="endpointDescription_MOKl">写入一条历史材料</span></div><pre class="codeBlock_je8t"><code>{
+  &quot;content&quot;: &quot;Completed user auth module. MailCodeService handles TTL.&quot;,
+  &quot;recordKind&quot;: &quot;task_summary&quot;,
+  &quot;scope&quot;: { &quot;projectId&quot;: &quot;p_demo&quot; },
+  &quot;ttlPolicy&quot;: &quot;365d&quot;
+}</code></pre></div></div></div><div class="errorCodes_1ZHC reveal_xowv" data-reveal="true"><h4>错误码结构</h4><div class="errorGrid_uS0h"><div class="errorItem_n0Et"><code>MEM-AUTH*</code><span>认证与授权错误</span></div><div class="errorItem_n0Et"><code>MEM-MEM*</code><span>记忆读写错误</span></div><div class="errorItem_n0Et"><code>MEM-RECALL*</code><span>召回管线错误</span></div><div class="errorItem_n0Et"><code>MEM-JUDGE*</code><span>Judge / LLM Provider 错误</span></div><div class="errorItem_n0Et"><code>MEM-SEARCH*</code><span>Embedding 与检索错误</span></div><div class="errorItem_n0Et"><code>MEM-SYS*</code><span>系统与参数校验错误</span></div></div></div></div></section><section id="deploy" class="section_HYzw"><div class="container_L8UQ"><div class="sectionLabel_trO2">部署</div><h2 class="sectionTitle_dRp2">五分钟内跑通完整闭环</h2><div class="deployGrid_nYlW"><div class="deploySteps_akdb"><article class="deployStep_QYF4 reveal_xowv" data-reveal="true"><div class="deployStepNumber_uZka">1</div><div class="deployStepContent_fTpt"><h4>克隆部署仓库</h4><pre class="codeBlock_je8t"><code>git clone https://github.com/plumememory/memory-deploy
+cd memory-deploy</code></pre></div></article><article class="deployStep_QYF4 reveal_xowv" data-reveal="true"><div class="deployStepNumber_uZka">2</div><div class="deployStepContent_fTpt"><h4>配置环境变量</h4><pre class="codeBlock_je8t"><code>cp .env.example .env
+# Set required variables:
 MEMORY_BOOTSTRAP_ADMIN_USERNAME=admin
 MEMORY_BOOTSTRAP_ADMIN_PASSWORD=change-me-now
-POSTGRES_PASSWORD=your-db-password</code></pre>
-            </div>
-          </div>
-          <div class="step reveal">
-            <div class="step-num">3</div>
-            <div class="step-content">
-              <h4 data-i18n="dep_s3">Start the stack</h4>
-              <pre class="code-block"><code><span class="c"># Development</span>
+POSTGRES_PASSWORD=your-db-password</code></pre></div></article><article class="deployStep_QYF4 reveal_xowv" data-reveal="true"><div class="deployStepNumber_uZka">3</div><div class="deployStepContent_fTpt"><h4>启动整套服务</h4><pre class="codeBlock_je8t"><code># Development
 docker compose -f docker-compose.dev.yml up -d
 
-<span class="c"># Production (with TLS via Caddy/Nginx)</span>
-docker compose -f docker-compose.prod.yml up -d</code></pre>
-            </div>
-          </div>
-          <div class="step reveal">
-            <div class="step-num">4</div>
-            <div class="step-content">
-              <h4 data-i18n="dep_s4">Verify the MVP</h4>
-              <pre class="code-block"><code>bash verify-mvp.sh
-<span class="c"># ✓ Write stable memory
+# Production (with TLS via Caddy/Nginx)
+docker compose -f docker-compose.prod.yml up -d</code></pre></div></article><article class="deployStep_QYF4 reveal_xowv" data-reveal="true"><div class="deployStepNumber_uZka">4</div><div class="deployStepContent_fTpt"><h4>验证 MVP</h4><pre class="codeBlock_je8t"><code>bash verify-mvp.sh
+# ✓ Write stable memory
 # ✓ Write history record
 # ✓ Task recall
 # ✓ Cross-agent read
-# ✓ Delete &amp; temporary mode</span></code></pre>
-            </div>
-          </div>
-        </div>
-        <div class="deploy-info">
-          <div class="di-card reveal">
-            <h4 data-i18n="di1">What's included</h4>
-            <ul>
-              <li data-i18n="di1_l1">memory-server — Java Spring Boot core</li>
-              <li data-i18n="di1_l2">memory-web — React admin console</li>
-              <li data-i18n="di1_l3">PostgreSQL 16 + pgvector + zhparser</li>
-              <li data-i18n="di1_l4">Caddy / Nginx reverse proxy examples</li>
-            </ul>
-          </div>
-          <div class="di-card reveal">
-            <h4 data-i18n="di2">Enable vector search</h4>
-            <pre class="code-block"><code>MEMORY_EMBEDDING_ENABLED=true
+# ✓ Delete &amp; temporary mode</code></pre></div></article></div><div class="deployInfo_kWMn"><article class="infoCard_p_3Z reveal_xowv" data-reveal="true"><h4>包含内容</h4><ul class="infoList_RZVh"><li>memory-server：Java Spring Boot 核心服务</li><li>memory-web：React 管理控制台</li><li>PostgreSQL 16 + pgvector + zhparser</li><li>Caddy / Nginx 反向代理示例</li></ul></article><article class="infoCard_p_3Z reveal_xowv" data-reveal="true"><h4>启用向量检索</h4><pre class="codeBlock_je8t"><code>MEMORY_EMBEDDING_ENABLED=true
 MEMORY_EMBEDDING_API_KEY=sk-...
-MEMORY_EMBEDDING_MODEL=text-embedding-3-small</code></pre>
-          </div>
-          <div class="di-card reveal">
-            <h4 data-i18n="di3">Enable LLM Judge</h4>
-            <pre class="code-block"><code>MEMORY_JUDGE_LLM_ENABLED=true
+MEMORY_EMBEDDING_MODEL=text-embedding-3-small</code></pre></article><article class="infoCard_p_3Z reveal_xowv" data-reveal="true"><h4>启用 LLM Judge</h4><pre class="codeBlock_je8t"><code>MEMORY_JUDGE_LLM_ENABLED=true
 MEMORY_LLM_API_KEY=sk-...
 MEMORY_LLM_MODEL=gpt-4o-mini
-MEMORY_LLM_BASE_URL=https://api.openai.com/v1</code></pre>
-          </div>
-          <div class="di-card repos reveal">
-            <h4 data-i18n="di4">Four-repo structure</h4>
-            <div class="repo-list">
-              <div class="repo"><span class="repo-lang java">Java</span><span
-                  class="repo-name">memory-server</span><span class="repo-desc" data-i18n="r1_d">Core business logic
-                  &amp; API</span></div>
-              <div class="repo"><span class="repo-lang ts">TS</span><span class="repo-name">client-shared</span><span
-                  class="repo-desc" data-i18n="r2_d">CLI + MCP Server adapter</span></div>
-              <div class="repo"><span class="repo-lang react">React</span><span class="repo-name">memory-web</span><span
-                  class="repo-desc" data-i18n="r3_d">Admin &amp; debug console</span></div>
-              <div class="repo"><span class="repo-lang docker">🐳</span><span
-                  class="repo-name">memory-deploy</span><span class="repo-desc" data-i18n="r4_d">Compose + proxy
-                  configs</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ─── FOOTER ───────────────────────────────────────────── -->
-  <footer id="footer">
-    <div class="footer-inner">
-      <div class="footer-brand">
-        <img src="img/羽忆-origin.png" alt="PlumeMemory Logo" class="logo-img" />
-        <div>
-          <div class="footer-name" data-i18n="logo_name">羽忆</div>
-          <div class="footer-tagline" data-i18n="ft_tag">Unified Cloud Memory Infrastructure</div>
-        </div>
-      </div>
-      <div class="footer-links">
-        <div class="fl-group">
-          <div class="fl-title" data-i18n="fl_t1">Project</div>
-          <a href="#architecture" data-i18n="nav_arch">Architecture</a>
-          <a href="#features" data-i18n="nav_feat">Features</a>
-          <a href="#api" data-i18n="nav_api">API Reference</a>
-          <a href="#deploy" data-i18n="nav_deploy">Deployment</a>
-        </div>
-        <div class="fl-group">
-          <div class="fl-title" data-i18n="fl_t2">Design Documents</div>
-          <a href="/docs/docs/concepts/memory-model">Core Object Model</a>
-          <a href="/docs/docs/concepts/memory-judge">Memory Judge</a>
-          <a href="/docs/docs/concepts/recall-orchestrator">Recall Orchestrator</a>
-          <a href="/docs/docs/architecture/security">Security Design</a>
-        </div>
-        <div class="fl-group">
-          <div class="fl-title" data-i18n="fl_t3">Repositories</div>
-          <a href="https://github.com/plumememory/memory-server" target="_blank">memory-server</a>
-          <a href="https://github.com/plumememory/memory-web" target="_blank">memory-web</a>
-          <a href="https://github.com/plumememory/client-shared" target="_blank">client-shared</a>
-          <a href="https://github.com/plumememory/memory-deploy" target="_blank">memory-deploy</a>
-        </div>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <span>AGPL-3.0 License · Open Source</span>
-      <span>Built with Java 21 · Spring Boot 3.3 · PostgreSQL 16</span>
-    </div>
-  </footer>
-
-  <script src="js/i18n.js"></script>
-  <script src="js/main.js"></script>
+MEMORY_LLM_BASE_URL=https://api.openai.com/v1</code></pre></article><article class="infoCard_p_3Z reveal_xowv" data-reveal="true"><h4>四仓库结构</h4><div class="repoList_JCHD"><div class="repoItem_Iv8c"><span class="repoBadge_HLsO java_ax5b">Java</span><span class="repoName_NODn">memory-server</span><span class="repoDescription_Iugb">核心业务逻辑与 API</span></div><div class="repoItem_Iv8c"><span class="repoBadge_HLsO ts_NrV9">TS</span><span class="repoName_NODn">client-shared</span><span class="repoDescription_Iugb">CLI + MCP Server 适配层</span></div><div class="repoItem_Iv8c"><span class="repoBadge_HLsO react_hilK">React</span><span class="repoName_NODn">memory-web</span><span class="repoDescription_Iugb">管理台与调试控制台</span></div><div class="repoItem_Iv8c"><span class="repoBadge_HLsO docker_mbRZ">🐳</span><span class="repoName_NODn">memory-deploy</span><span class="repoDescription_Iugb">Compose 与代理配置</span></div></div></article></div></div></div></section></main></div><footer class="footer_VlXX"><div class="footerInner_s9wC"><div class="footerBrand__nd3"><img src="/img/羽忆-origin.png" alt="PlumeMemory Logo" class="footerLogo_ZHve"><div><div class="footerName_HTk1">羽忆</div><div class="footerTagline_a3sP">统一的云记忆基础设施</div></div></div><div class="footerLinks_Tr56"><div class="footerGroup__Xut"><div class="footerGroupTitle_U2RY">项目</div><a href="#architecture">架构设计</a><a href="#features">核心设计</a><a href="#api">API 参考</a><a href="#deploy">快速部署</a></div><div class="footerGroup__Xut"><div class="footerGroupTitle_U2RY">设计文档</div><a href="/docs/concepts/memory-model">核心对象模型</a><a href="/docs/concepts/memory-judge">Memory Judge</a><a href="/docs/concepts/recall-orchestrator">Recall Orchestrator</a><a href="/docs/architecture/security">安全设计</a></div><div class="footerGroup__Xut"><div class="footerGroupTitle_U2RY">仓库</div><a href="https://github.com/plumememory/memory-server" target="_blank" rel="noreferrer">memory-server</a><a href="https://github.com/plumememory/memory-web" target="_blank" rel="noreferrer">memory-web</a><a href="https://github.com/plumememory/client-shared" target="_blank" rel="noreferrer">client-shared</a><a href="https://github.com/plumememory/memory-deploy" target="_blank" rel="noreferrer">memory-deploy</a></div></div></div><div class="footerBottom_JD65"><span>AGPL-3.0 License · Open Source</span><span>Built with Java 21 · Spring Boot 3.3 · PostgreSQL 16</span></div></footer></div>
 </body>
-
 </html>
